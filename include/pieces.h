@@ -14,8 +14,8 @@ typedef struct
 }Piecetype;
 
 typedef struct{
-    int white = 0;
-    int black = 1;
+    int white ;
+    int black;
 }Color;
 
 
