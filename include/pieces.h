@@ -14,9 +14,16 @@ typedef struct
 }Piecetype;
 
 typedef struct{
-    int white ;
-    int black;
+    char white ;
+    char black;
 }Color;
+
+typedef struct{
+    Piecetype type;
+    Color color;
+}Piece;
+
+
 
 
 #endif
