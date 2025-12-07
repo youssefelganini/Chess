@@ -1,26 +1,21 @@
 #ifndef PIECES_H
 #define PIECES_H
 
-typedef struct
-{
-    char king ;
-    char queen ;
-    char bishop ;
-    char knight ;
-    char rock ;
-    char pawn ;
-    char empty;
+#define KING 0
+#define QUEEN 1
+#define ROCK 2
+#define BISHOP 3
+#define KNIGHT 4
+#define PAWN 5
+#define EMPTY 6
 
-}Piecetype;
+#define WHITE 1
+#define BLACK 2
 
-typedef struct{
-    char white ;
-    char black;
-}Color;
 
 typedef struct{
-    Piecetype type;
-    Color color;
+    int type;
+    int color;
 }Piece;
 
 
