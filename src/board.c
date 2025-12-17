@@ -1,5 +1,27 @@
-#include"Uni\Prog\project\Chess\include\board.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
 #include<stdio.h>
+void initboard(Board *b){
+    int ppos[8] = {ROCK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROCK };
+
+    for(int i = 0 ; i < bsize ; ++i){
+        b->square[0][i].type = ppos[i];
+        b->square[0][i].color = WHITE;
+        b->square[1][i].type = PAWN;
+        b->square[1][i].color = WHITE;
+    }
+    for(int i = 0 ; i < bsize ; ++i){
+        b->square[7][i].type = ppos[i];
+        b->square[7][i].color = BLACK;
+        b->square[6][i].type = PAWN;
+        b->square[6][i].color = BLACK;
+    }
+    for(int i = 2 ; i < 6 ; ++i){
+        for(int j = 0 ; j < bsize ; ++j){
+            b->square[i][j].type = EMPTY;
+            b->square[i][j].color = EMPTY;
+        }
+    }
+}
 
 char piece_char(Piece p){
     if(p.color == WHITE){
@@ -91,27 +113,17 @@ for(int i = 0 ; i < 8 ; ++i){
 printf("+\n");
 }
 
-
-void initboard(Board *b){
-    int ppos[8] = {ROCK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROCK };
-
-    for(int i = 0 ; i < bsize ; ++i){
-        b->square[0][i].type = ppos[i];
-        b->square[0][i].color = WHITE;
-        b->square[1][i].type = PAWN;
-        b->square[1][i].color = WHITE;
+void display_captured_pieces(Board *b) {
+    printf("\nCaptured Pieces:\n");
+    printf("White captured: ");
+    for (int i = 0; i < b->whitecapturedcount; i++) {
+        printf("%c ", piece_char(b->whitecaptured[i]));
     }
-    for(int i = 0 ; i < bsize ; ++i){
-        b->square[7][i].type = ppos[i];
-        b->square[7][i].color = BLACK;
-        b->square[6][i].type = PAWN;
-        b->square[6][i].color = BLACK;
+    printf("\n");
+    
+    printf("Black captured: ");
+    for (int i = 0; i < b->blackcapturedcount; i++) {
+        printf("%c ", piece_char(b->blackcaptured[i]));
     }
-    for(int i = 2 ; i < 6 ; ++i){
-        for(int j = 0 ; j < bsize ; ++j){
-            b->square[i][j].type = EMPTY;
-            b->square[i][j].color = EMPTY;
-        }
-    }
+    printf("\n");
 }
-
