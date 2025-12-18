@@ -22,8 +22,8 @@ int input_as_int[4];
 
 
 void convert_input_to_int(char *x) {
-    input_as_int[0] = x[0] - 'a';       // العمود 0-7
-    input_as_int[1] = x[1] - '1';       // الصف 1-8 → index 0-7
+    input_as_int[0] = x[0] - 'a';     
+    input_as_int[1] = x[1] - '1';       
     input_as_int[2] = x[2] - 'a';
     input_as_int[3] = x[3] - '1';
 }
