@@ -10,6 +10,12 @@ typedef struct
     Piece blackcaptured[16];
     int whitecapturedcount;
     int blackcapturedcount;
+    int whitekingmoved;
+    int blackkingmoved;
+    int whiterook_amoved;
+    int whiterook_hmoved;
+    int blackrook_amoved;
+    int blackrook_hmoved;
 }Board;
 
 

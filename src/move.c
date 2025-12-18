@@ -1,8 +1,9 @@
-/*#include "move.h"
+#include "move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"*/
+#include"board.h"
 #include <stdlib.h>
+#include"game.h"
 
 int flag=0;
 int counter=0;
@@ -17,7 +18,6 @@ checkmate
 
 
 
-int input_as_int[4];  // global array
 
 void convert_input_to_int(char *x) {
     input_as_int[0]=x[0] - 'a'; // start column
@@ -94,94 +94,94 @@ int castling_path_clear(Board *b,int king_row,int king_col,int rook_col) {
     }
     return 1;
 }
-int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion if castl[0]=='c' 
-                                        still i want to ckeack the king square is chacked or not befor castling*/
-    if(is_king_checked(b)!=1){
-        if(/*white is playing*/){
-            if(castl[1]=='R'||castl[1]=='r'){
-                if(b->square[7][4].type==KING && b->square[7][7].type==ROCK){
-                    if(!castling_path_clear(b, 7, 4, 7)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[7][6]=K && square[7][5]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }
+// int castling(Board *b, char *castl , Game *game){  /*when callilng fn we will put a condetion if castl[0]=='c' 
+//                                         still i want to ckeack the king square is chacked or not befor castling*/
+//     if(is_king_checked(b)!=1){
+//         if(game->current_player == WHITE){
+//             if(castl[1]=='R'||castl[1]=='r'){
+//                 if(b->square[7][4].type==KING && b->square[7][7].type==ROCK){
+//                     if(!castling_path_clear(b, 7, 4, 7)){
+//                         printf("Cannot castle, path blocked\n");
+//                         return 0;
+//                     }
+//                     /* square[7][6]=K && square[7][5]=R */
+//                 }
+//                 else {
+//                     printf("You canot castle and you moved king or rook\n");
+//                     return 0;
+//                 }
 
-            }
-            else if(castl[1]=='l'||castl[1]=='L'){
-                if(b->square[7][4].type==KING && b->square[7][0].type==ROCK){
-                    if(!castling_path_clear(b, 7, 4, 0)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[7][2]=K && square[7][3]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }                    
+//             }
+//             else if(castl[1]=='l'||castl[1]=='L'){
+//                 if(b->square[7][4].type==KING && b->square[7][0].type==ROCK){
+//                     if(!castling_path_clear(b, 7, 4, 0)){
+//                         printf("Cannot castle, path blocked\n");
+//                         return 0;
+//                     }
+//                     /* square[7][2]=K && square[7][3]=R */
+//                 }
+//                 else {
+//                     printf("You canot castle and you moved king or rook\n");
+//                     return 0;
+//                 }                    
 
-            }
-            else{
-                printf("Invalid input\n");
-                return 0;
-            }
+//             }
+//             else{
+//                 printf("Invalid input\n");
+//                 return 0;
+//             }
 
-        }
-        else if(/*Black is playing*/){
-            if(castl[1]=='R'||castl[1]=='r'){
-                if(b->square[0][4].type==KING && b->square[0][7].type==ROCK){
-                    if(!castling_path_clear(b, 0, 4, 7)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[0][6]=K && square[0][5]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }
+//         }
+//         else if(game->current_player == BLACK){
+//             if(castl[1]=='R'||castl[1]=='r'){
+//                 if(b->square[0][4].type==KING && b->square[0][7].type==ROCK){
+//                     if(!castling_path_clear(b, 0, 4, 7)){
+//                         printf("Cannot castle, path blocked\n");
+//                         return 0;
+//                     }
+//                     /* square[0][6]=K && square[0][5]=R */
+//                 }
+//                 else {
+//                     printf("You canot castle and you moved king or rook\n");
+//                     return 0;
+//                 }
 
-            }
-            else if(castl[1]=='l'||castl[1]=='L'){
-                if(b->square[0][4].type==KING && b->square[0][0].type==ROCK){
-                    if(!castling_path_clear(b, 0, 4, 0)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                         /*square[0][2]=K && square[0][3]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }                    
+//             }
+//             else if(castl[1]=='l'||castl[1]=='L'){
+//                 if(b->square[0][4].type==KING && b->square[0][0].type==ROCK){
+//                     if(!castling_path_clear(b, 0, 4, 0)){
+//                         printf("Cannot castle, path blocked\n");
+//                         return 0;
+//                     }
+//                          /*square[0][2]=K && square[0][3]=R */
+//                 }
+//                 else {
+//                     printf("You canot castle and you moved king or rook\n");
+//                     return 0;
+//                 }                    
 
-            }
-            else{
-                printf("Invalid input\n");
-                return 0;
-            }
+//             }
+//             else{
+//                 printf("Invalid input\n");
+//                 return 0;
+//             }
 
-        }
+//         }
 
-    }
-    else{
-        printf("You cannot castle and your king is checked\n");
-        return 0;
-    }
-}
-/*----------------------------------------------------------------------------------------------------------*/
-
-
+//     }
+//     else{
+//         printf("You cannot castle and your king is checked\n");
+//         return 0;
+//     }
+// }
+// /*----------------------------------------------------------------------------------------------------------*/
 
 
-int is_king_checked(Board*b){
+
+
+// int is_king_checked(Board*b){
     
-}
+// }
 /*----------------------------------------------------------------------------------------------------------*/
 int validation(char *x,Board *b){
     convert_input_to_int(x);
@@ -306,18 +306,19 @@ int validation(char *x,Board *b){
 /*----------------------------------------------------------------------------------------------------------*/
 void execute_move(Board *board, int from_row, int from_col,
                  int to_row, int to_col) {
-    Piece moving_piece = board->squares[from_row][from_col];
-    Piece captured_piece = board->squares[to_row][to_col];
+    Piece moving_piece = board->square[from_row][from_col];
+    Piece captured_piece = board->square[to_row][to_col];
     
  
     if (captured_piece.type != EMPTY) {
         if (captured_piece.color == WHITE) {
-            board->black_captured[board->black_captured_count++] = captured_piece;
+            board->blackcaptured[board->blackcapturedcount++] = captured_piece;
         } else {
-            board->white_captured[board->white_captured_count++] = captured_piece;
+            board->whitecaptured[board->whitecapturedcount++] = captured_piece;
         }
     }
     
-    board->squares[to_row][to_col] = moving_piece;
-    board->squares[from_row][from_col].type = EMPTY;
-    board->squares[from_row][from_col].color = NONE;}
+    board->square[to_row][to_col] = moving_piece;
+    board->square[from_row][from_col].type = EMPTY;
+    board->square[from_row][from_col].color = EMPTY;
+}

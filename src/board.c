@@ -29,24 +29,18 @@ char piece_char(Piece p){
         {
         case PAWN:
             return 'p';
-            break;
         case ROCK:
             return 'r';
-            break;
         case KNIGHT:
             return 'n';
-            break;
         case BISHOP:
             return 'b';
-            break;
         case QUEEN:
             return 'q';
-            break;
         case KING:
             return 'k';
-            break;
         default:
-            break;
+            return ' ';
         }
     }
     else if (p.color == BLACK){
@@ -54,29 +48,21 @@ char piece_char(Piece p){
         {
         case PAWN:
             return 'P';
-            break;
         case ROCK:
             return 'R';
-            break;
         case KNIGHT:
             return 'N';
-            break;
         case BISHOP:
             return 'B';
-            break;
         case QUEEN:
             return 'Q';
-            break;
         case KING:
             return 'K';
-            break;
         default:
-            break;
+            return ' ';
         }
     }
-    else{
-        return ' ';
-    }
+    return ' ';
 }
 
 void displayboard(Board *b){
@@ -113,7 +99,7 @@ for(int i = 0 ; i < 8 ; ++i){
 printf("+\n");
 }
 
-void display_captured_pieces(Board *b) {
+void capturedpieces(Board *b) {
     printf("\nCaptured Pieces:\n");
     printf("White captured: ");
     for (int i = 0; i < b->whitecapturedcount; i++) {
