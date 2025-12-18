@@ -13,7 +13,7 @@ char boardlayout[8][8] = {
 
 char boardColor[2] = {'.','-'};
 void initboard(Board *b){
-    int ppos[8] = {ROCK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROCK };
+    int ppos[8] = {ROOK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROOK };
 
     for(int i = 0 ; i < bsize ; ++i){
         b->square[0][i].type = ppos[i];
@@ -41,7 +41,7 @@ char piece_char(Piece p){
         {
         case PAWN:
             return 'p';
-        case ROCK:
+        case ROOK:
             return 'r';
         case KNIGHT:
             return 'n';
@@ -60,7 +60,7 @@ char piece_char(Piece p){
         {
         case PAWN:
             return 'P';
-        case ROCK:
+        case ROOK:
             return 'R';
         case KNIGHT:
             return 'N';

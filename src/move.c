@@ -21,12 +21,13 @@ int input_as_int[4];
 
 
 
-void convert_input_to_int(char *x) {
-    input_as_int[0] = x[0] - 'a';     
-    input_as_int[1] = x[1] - '1';       
+void convert_input_to_int(char *x){
+    input_as_int[0] = x[0] - 'a';        // column a-h -> 0-7
+    input_as_int[1] = 8 - (x[1] - '0');  // rank 1-8 -> row 7-0
     input_as_int[2] = x[2] - 'a';
-    input_as_int[3] = x[3] - '1';
+    input_as_int[3] = 8 - (x[3] - '0');
 }
+
 
 
 
@@ -105,7 +106,7 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
     if(is_king_checked(board)!=1){
         if(game->current_player==WHITE){
             if(castl[1]=='R'||castl[1]=='r'){
-                if(board->square[7][4].type==KING && board->square[7][7].type==ROCK){
+                if(board->square[7][4].type==KING && board->square[7][7].type==ROOK){
                     if(!castling_path_clear(board, 7, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -119,7 +120,7 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
-                if(board->square[7][4].type==KING && board->square[7][0].type==ROCK){
+                if(board->square[7][4].type==KING && board->square[7][0].type==ROOK){
                     if(!castling_path_clear(board, 7, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -140,7 +141,7 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
         }
         else if(game->current_player==BLACK){
             if(castl[1]=='R'||castl[1]=='r'){
-                if(board->square[0][4].type==KING && board->square[0][7].type==ROCK){
+                if(board->square[0][4].type==KING && board->square[0][7].type==ROOK){
                     if(!castling_path_clear(board, 0, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -154,7 +155,7 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
-                if(board->square[0][4].type==KING && board->square[0][0].type==ROCK){
+                if(board->square[0][4].type==KING && board->square[0][0].type==ROOK){
                     if(!castling_path_clear(board, 0, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -204,7 +205,7 @@ int change_pawn(Board *board){
             case 'Q':
             case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN; break;
             case 'R':
-            case 'r': board->square[input_as_int[3]][input_as_int[2]].type=ROCK; break;
+            case 'r': board->square[input_as_int[3]][input_as_int[2]].type=ROOK; break;
             case 'B':
             case 'b': board->square[input_as_int[3]][input_as_int[2]].type=BISHOP; break;
             case 'N':
@@ -232,9 +233,9 @@ int validation(char *x,Board *board){
         return 0;
     }
     printf("Input: %s -> int: [%d,%d,%d,%d]\n", x, input_as_int[0], input_as_int[1], input_as_int[2], input_as_int[3]);
-printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int[0]].type);
 
-    char piece=(board->square[input_as_int[1]][input_as_int[0]].type); /*current piece*/
+
+    char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]); /*current piece*/
     if(x[0]==x[2]&&x[1]==x[3]) {
         printf("Invlaid input ,you didnot move the piece\n");
         return 0;}
@@ -245,8 +246,8 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
     }
     switch (piece)
     {
-    case 'r':
     case 'R':
+    case 'r':
         if(path_check(board)==0){
            printf("Path is blocked\n");
             return 0;
@@ -259,36 +260,35 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
             return 0;
         }
         return bishop();
-    case 'Q':
     case 'q':
+    case 'Q':
         if(path_check(board)==0){
             printf("Path is blocked\n");
             return 0;
         }
         return queen();
-    case 'K':
-    case 'k':
-        return king();
     case 'N':
     case 'n':
         return knight();
+    case 'K':
+    case 'k':
+        return king();
     case 'P':
-        if(x[1]=='2'  && x[0]==x[2] ){
+         if(x[1]=='2'  && x[0]==x[2] ){
             if(x[3]=='4'){
-                if(path_check(board)==0){
-                    printf("Path is blocked\n");
+                 if(path_check(board)==0){
+                     printf("Path is blocked\n");
                     return 0;
                 }
                 if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                     printf("Canot move here the square is not empty\n");
                     return 0;
-                }
-                
+                }     
             return 1;                
             }
         }
         if(input_as_int[3]==input_as_int[1]+1 &&input_as_int[0]==input_as_int[2]) {
-            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
+           if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                 printf("Canot move here the square is not empty\n");
                 return 0;
             }/*check for pawn if there is piece a black piece or white where it goes*/
@@ -297,7 +297,7 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
             }
         }
         if(input_as_int[3]==input_as_int[1]+1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(board->square[input_as_int[3]][input_as_int[2]].type!=BLACK){
+            if(board->square[input_as_int[3]][input_as_int[2]].color!=BLACK){
                 printf("This move is invalid\n");
                 return 0;
             }
@@ -306,8 +306,6 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
         }
         printf("The pawn canot move like that");
         return 0;
-
-        
     case 'p':
         if(x[1]=='7' && x[2]==x[0]){
             if(x[3]=='5'){
@@ -332,7 +330,7 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
             }
         }
         if(input_as_int[3]==input_as_int[1]-1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(board->square[input_as_int[3]][input_as_int[2]].type!=WHITE){
+            if(board->square[input_as_int[3]][input_as_int[2]].color!=WHITE){
                 printf("This move is invalid\n");
                 return 0;
             }
@@ -341,7 +339,6 @@ printf("Piece at from square: %c\n", board->square[input_as_int[1]][input_as_int
         printf("The pawn canot move like that");
         return 0;
         
-    
     default:
         printf("Invalid input,This square has no pieces\n");
         return 0;
