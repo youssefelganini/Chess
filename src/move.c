@@ -1,7 +1,7 @@
-/*#include "move.h"
+#include "move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"*/
+#include"board.h"
 #include <stdlib.h>
 
 int flag=0;
@@ -11,6 +11,7 @@ int counter=0;
 /*we didnot write in validition if teh rook return 0 what it will print
 x is the input
 a  has the values of the input as int
+c array for castling
 checkoftheking
 checkmate
 */
@@ -60,25 +61,25 @@ int queen(){
     return 0;
 }
 /*----------------------------------------------------------------------------------------------------------*/
-int path_check(Board *b){
+int path_check(Board *board){
     int dx=sign(input_as_int[2]-input_as_int[0]);
     int dy=sign(input_as_int[3]-input_as_int[1]);
     int x=dx+input_as_int[0];
     int y=dy+input_as_int[1];
     while (x!=input_as_int[2]||y!=input_as_int[3])
     {
-        if(b->square[y][x].type!= EMPTY) return 0;
+        if(board->square[y][x].type!= EMPTY) return 0;
         x+=dx;
         y+=dy;
     }
     return 1;
 }
 int dest_check(Board*b){
-    if(b->square[input_as_int[3]][input_as_int[2]].type==b->square[input_as_int[1]][input_as_int[0]].type ) return 0;
+    if(board->square[input_as_int[3]][input_as_int[2]].type==board->square[input_as_int[1]][input_as_int[0]].type ) return 0;
     return 1;
 }
 /*----------------------------------------------------------------------------------------------------------*/
-int castling_path_clear(Board *b,int king_row,int king_col,int rook_col) {
+int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
     int dx;
     if((rook_col-king_col)>0){ 
         dx=1;
@@ -87,20 +88,20 @@ int castling_path_clear(Board *b,int king_row,int king_col,int rook_col) {
     int x=king_col + dx;
 
     while (x!= rook_col) {  
-        if (b->square[king_row][x].type!=EMPTY) {
+        if (board->square[king_row][x].type!=EMPTY) {
             return 0; 
         }
         x += dx;
     }
     return 1;
 }
-int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion if castl[0]=='c' 
+int castling(Board *board, char *castl){  /*when callilng fn we will put a condetion if castl[0]=='c' 
                                         still i want to ckeack the king square is chacked or not befor castling*/
-    if(is_king_checked(b)!=1){
+    if(is_king_checked(board)!=1){
         if(/*white is playing*/){
             if(castl[1]=='R'||castl[1]=='r'){
-                if(b->square[7][4].type==KING && b->square[7][7].type==ROCK){
-                    if(!castling_path_clear(b, 7, 4, 7)){
+                if(board->square[7][4].type==KING && board->square[7][7].type==ROCK){
+                    if(!castling_path_clear(board, 7, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
@@ -113,7 +114,7 @@ int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
-                if(b->square[7][4].type==KING && b->square[7][0].type==ROCK){
+                if(board->square[7][4].type==KING && board->square[7][0].type==ROCK){
                     if(!castling_path_clear(b, 7, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -134,8 +135,8 @@ int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion
         }
         else if(/*Black is playing*/){
             if(castl[1]=='R'||castl[1]=='r'){
-                if(b->square[0][4].type==KING && b->square[0][7].type==ROCK){
-                    if(!castling_path_clear(b, 0, 4, 7)){
+                if(board->square[0][4].type==KING && board->square[0][7].type==ROCK){
+                    if(!castling_path_clear(board, 0, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
@@ -148,8 +149,8 @@ int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
-                if(b->square[0][4].type==KING && b->square[0][0].type==ROCK){
-                    if(!castling_path_clear(b, 0, 4, 0)){
+                if(board->square[0][4].type==KING && board->square[0][0].type==ROCK){
+                    if(!castling_path_clear(board, 0, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
@@ -175,21 +176,51 @@ int castling(Board *b, char *castl){  /*when callilng fn we will put a condetion
     }
 }
 /*----------------------------------------------------------------------------------------------------------*/
-
-
-
-
-int is_king_checked(Board*b){
+int pawn_promotion(Board *board){
+    if(board->squares[0][input_as_int[2]].type==PAWN &&
+       board->squares[0][input_as_int[2]].color==WHITE){
+        return 1;
+    }
+    if(board->squares[7][input_as_int[2]].type==PAWN &&
+       board->squares[7][input_as_int[2]].color==BLACK){
+        return 1;
+    }
+    return 0;
+}
+int change_pawn(Board *board){
+    if(pawn_promotion(board)){
+        char promotion;
+        printf("Enter which piece you want\n");
+        scanf(" %c",&promotion);
+        switch(promotion){
+            case 'Q':
+            case 'q': board->squares[input_as_int[3]][input_as_int[2]].type=QUEEN; break;
+            case 'R':
+            case 'r': board->squares[input_as_int[3]][input_as_int[2]].type=ROCK; break;
+            case 'B':
+            case 'b': board->squares[input_as_int[3]][input_as_int[2]].type=BISHOP; break;
+            case 'N':
+            case 'n': board->squares[input_as_int[3]][input_as_int[2]].type=KNIGHT; break;
+            default: 
+                printf("Invalid input\n");
+                return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
+/*----------------------------------------------------------------------------------------------------------*/
+int is_king_checked(Board*board){
     
 }
 /*----------------------------------------------------------------------------------------------------------*/
-int validation(char *x,Board *b){
+int validation(char *x,Board *board){
     convert_input_to_int(x);
-    if(dest_check(b)==0){
+    if(dest_check(board)==0){
         printf("You cannot capture your own piece\n");
         return 0;
     }
-    char piece=piece_char(b->square[input_as_int[1]][input_as_int[0]]); /*current piece*/
+    char piece=(board->square[input_as_int[1]][input_as_int[0]]); /*current piece*/
     if(x[0]==x[2]&&x[1]==x[3]) {
         printf("Invlaid input ,you didnot move the piece\n");
         return 0;}
@@ -202,21 +233,21 @@ int validation(char *x,Board *b){
     {
     case 'r':
     case 'R':
-        if(path_check(b)==0){
+        if(path_check(board)==0){
            printf("Path is blocked\n");
             return 0;
         }
         return rook();
     case 'b':
     case 'B':
-        if(path_check(b)==0){
+        if(path_check(board)==0){
             printf("Path is blocked\n");
             return 0;
         }
         return bishop();
     case 'Q':
     case 'q':
-        if(path_check(b)==0){
+        if(path_check(board)==0){
             printf("Path is blocked\n");
             return 0;
         }
@@ -230,11 +261,11 @@ int validation(char *x,Board *b){
     case 'P':
         if(x[1]=='2'  && x[0]==x[2] ){
             if(x[3]=='4'){
-                if(path_check(b)==0){
+                if(path_check(board)==0){
                     printf("Path is blocked\n");
                     return 0;
                 }
-                if(b->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
+                if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                     printf("Canot move here the square is not empty\n");
                     return 0;
                 }
@@ -243,7 +274,7 @@ int validation(char *x,Board *b){
             }
         }
         if(input_as_int[3]==input_as_int[1]+1 &&input_as_int[0]==input_as_int[2]) {
-            if(b->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
+            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                 printf("Canot move here the square is not empty\n");
                 return 0;
             }/*check for pawn if there is piece a black piece or white where it goes*/
@@ -252,7 +283,7 @@ int validation(char *x,Board *b){
             }
         }
         if(input_as_int[3]==input_as_int[1]+1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(b->square[input_as_int[3]][input_as_int[2]].type!=BLACK){
+            if(board->square[input_as_int[3]][input_as_int[2]].type!=BLACK){
                 printf("This move is invalid\n");
                 return 0;
             }
@@ -270,7 +301,7 @@ int validation(char *x,Board *b){
                     printf("Path is blocked\n");  
                     return 0;
                 }
-                if(b->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
+                if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                     printf("Canot move here the square not empty\n");
                     return 0;
                 }
@@ -278,7 +309,7 @@ int validation(char *x,Board *b){
             }
         }
         if(input_as_int[3]==input_as_int[1]-1 &&input_as_int[0]==input_as_int[2]) {
-            if(b->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
+            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                 printf("Canot move here the square is not empty\n");
                 return 0;
             }/*check for pawn if there is  a black piece or white where it goes*/
@@ -287,7 +318,7 @@ int validation(char *x,Board *b){
             }
         }
         if(input_as_int[3]==input_as_int[1]-1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(b->square[input_as_int[3]][input_as_int[2]].type!=WHITE){
+            if(board->square[input_as_int[3]][input_as_int[2]].type!=WHITE){
                 printf("This move is invalid\n");
                 return 0;
             }
