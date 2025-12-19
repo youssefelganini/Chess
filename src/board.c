@@ -100,7 +100,7 @@ void displayboard(Board *b){
             }
         }
     
-    printf("|\n");
+    printf("| %d\n",num);
     num--;
     }
     printf("   ");
@@ -109,6 +109,11 @@ for(int i = 0 ; i < 8 ; ++i){
     printf("+---");
 }
 printf("+\n");
+printf("   ");
+for (int i = 0 ; i < 8 ; ++i){
+        printf("  %c ",'A'+i);
+    }
+printf("\n");
 }
 
 void capturedpieces(Board *b) {

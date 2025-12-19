@@ -104,7 +104,7 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
 int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will put a condetion if castl[0]=='c' 
                                         still i want to ckeack the king square is chacked or not befor castling*/
     if(is_king_checked(board)!=1){
-        if(game->current_player==WHITE){
+        if(game->current_player==WHITE && board->whitekingmoved!=1 && board->whiterook_hmoved!=1 && board->whiterook_amoved!=1){
             if(castl[1]=='R'||castl[1]=='r'){
                 if(board->square[7][4].type==KING && board->square[7][7].type==ROOK){
                     if(!castling_path_clear(board, 7, 4, 7)){
@@ -139,9 +139,9 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
             }
 
         }
-        else if(game->current_player==BLACK){
+        else if(game->current_player==BLACK && board->blackkingmoved!=1 && board->blackrook_hmoved!=1 && board->blackrook_amoved!=1){
             if(castl[1]=='R'||castl[1]=='r'){
-                if(board->square[0][4].type==KING && board->square[0][7].type==ROOK){
+                if(board->square[0][4].type==KING && board->square[0][7].type==ROOK ){
                     if(!castling_path_clear(board, 0, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
@@ -226,13 +226,33 @@ int is_king_checked(Board *board){
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
-int validation(char *x,Board *board){
+int validation(char *x,Board *board, Game *game){
+    if(x[0]<'a' || x[0]>'h' || x[2]<'a' || x[2]>'h' || 
+            x[1]<'1' || x[1]>'8' || x[3]<'1' || x[3]>'8') {
+        printf("Invalid input, must be in the range of (a-h) and (1-8)\n");
+        return 0;
+    }
     convert_input_to_int(x);
+    if(game->current_player==WHITE){
+        if(board->square[input_as_int[1]][input_as_int[0]].color!=WHITE){
+            printf("\nIt's White's turn. Please move a White piece.\n");
+            return 0;
+        }
+    }
+    else if(game->current_player==BLACK){
+        if(board->square[input_as_int[1]][input_as_int[0]].color!=BLACK){
+            printf("\nIt's Black's turn. Please move a Black piece.\n"); 
+            return 0;
+        }
+    }
+    if(board->square[input_as_int[1]][input_as_int[0]].type == EMPTY){
+        printf("You cannot move an empty square\n");
+        return 0;
+    }
     if(dest_check(board)==0){
         printf("You cannot capture your own piece\n");
         return 0;
     }
-    printf("Input: %s -> int: [%d,%d,%d,%d]\n", x, input_as_int[0], input_as_int[1], input_as_int[2], input_as_int[3]);
 
 
     char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]); /*current piece*/
@@ -363,4 +383,26 @@ void execute_move(Board *board, int from_row, int from_col,
     board->square[to_row][to_col] = moving_piece;
     board->square[from_row][from_col].type = EMPTY;
     board->square[from_row][from_col].color = EMPTY;
+
+    if(moving_piece.type == KING) {
+        if(moving_piece.color == WHITE) {
+            board->whitekingmoved = 1;
+        } else {
+            board->blackkingmoved = 1;
+        }
+    } else if(moving_piece.type == ROOK) {
+        if(moving_piece.color == WHITE) {
+            if(from_col == 0 && from_row == 7) {
+                board->whiterook_amoved = 1;
+            } else if(from_col == 7 && from_row == 7) {
+                board->whiterook_hmoved = 1;
+            }
+        } else {
+            if(from_col == 0 && from_row == 0) {
+                board->blackrook_amoved = 1;
+            } else if(from_col == 7 && from_row == 0) {
+                board->blackrook_hmoved = 1;
+            }
+        }
+    }
 }

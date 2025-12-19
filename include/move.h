@@ -17,7 +17,7 @@ int castling(Board *board,char *castl,Game *game);
 //int pawn_promotion(Board *board);
 int change_pawn(Board *board);
 int is_king_checked(Board *board);
-int validation(char *x,Board *board);
+int validation(char *x,Board *board, Game *game);
 void execute_move(Board *board,int from_row, int from_col,int to_row,int to_col);
 
 
