@@ -16,6 +16,8 @@ typedef struct
     int whiterook_hmoved;
     int blackrook_amoved;
     int blackrook_hmoved;
+    int enpassen_row;
+    int enpassen_col;
 }Board;
 
 

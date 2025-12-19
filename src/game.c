@@ -1,9 +1,9 @@
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"file_io.h"
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -40,6 +40,7 @@ void game_loop(Game *game){
     char input[100];
     int fromrow ,torow,fromcol,tocol;
     while(game->state == ONGOING){
+
         print_game_state(game);
         printf("\nEnter :");
         if(fgets(input,100,stdin) == NULL){
@@ -72,6 +73,7 @@ void game_loop(Game *game){
             continue;
         }
         printf("======================================\n");
+        castling(&game->board,input,game);
         convert_input_to_int(input);
         fromcol = input_as_int[0];
         fromrow = input_as_int[1];
@@ -80,6 +82,7 @@ void game_loop(Game *game){
         if (!validation(input,&game->board, game)) {
             continue;
         }
+        enpasswn(&game->board);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
 
         if (game->current_player == WHITE){
