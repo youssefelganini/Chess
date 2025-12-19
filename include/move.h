@@ -1,7 +1,7 @@
 #ifndef MOVE_H
 #define MOVE_H
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
 extern int input_as_int[4];  // global array
 void convert_input_to_int(char *x);
 int sign(int x);

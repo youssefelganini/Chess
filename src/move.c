@@ -1,9 +1,9 @@
-#include "/mnt/d/study/programming/Project/Chess/include/move.h"
+#include "C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
 #include<math.h>
 #include<stdio.h>
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
 #include <stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
 
 int flag=0;
 int counter=0;

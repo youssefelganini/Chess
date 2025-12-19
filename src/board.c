@@ -1,4 +1,4 @@
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
 #include<stdio.h>
 
 char boardlayout[8][8] = {
@@ -16,16 +16,16 @@ void initboard(Board *b){
     int ppos[8] = {ROOK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROOK };
 
     for(int i = 0 ; i < bsize ; ++i){
-        b->square[0][i].type = ppos[i];
-        b->square[0][i].color = WHITE;
-        b->square[1][i].type = PAWN;
-        b->square[1][i].color = WHITE;
+        b->square[7][i].type = ppos[i];
+        b->square[7][i].color = WHITE;
+        b->square[6][i].type = PAWN;
+        b->square[6][i].color = WHITE;
     }
     for(int i = 0 ; i < bsize ; ++i){
-        b->square[7][i].type = ppos[i];
-        b->square[7][i].color = BLACK;
-        b->square[6][i].type = PAWN;
-        b->square[6][i].color = BLACK;
+        b->square[0][i].type = ppos[i];
+        b->square[0][i].color = BLACK;
+        b->square[1][i].type = PAWN;
+        b->square[1][i].color = BLACK;
     }
     for(int i = 2 ; i < 6 ; ++i){
         for(int j = 0 ; j < bsize ; ++j){
@@ -36,7 +36,7 @@ void initboard(Board *b){
 }
 
 char piece_char(Piece p){
-    if(p.color == WHITE){
+    if(p.color == BLACK){
         switch (p.type)
         {
         case PAWN:
@@ -55,7 +55,7 @@ char piece_char(Piece p){
             return ' ';
         }
     }
-    else if (p.color == BLACK){
+    else if (p.color == WHITE){
         switch (p.type)
         {
         case PAWN:
@@ -78,8 +78,8 @@ char piece_char(Piece p){
 }
 
 void displayboard(Board *b){
-    int num= 1;
-    printf("   ");
+    int num= 8;
+    printf("\n   ");
     for (int i = 0 ; i < 8 ; ++i){
         printf("  %c ",'A'+i);
     } printf("\n");
@@ -101,7 +101,7 @@ void displayboard(Board *b){
         }
     
     printf("|\n");
-    num++;
+    num--;
     }
     printf("   ");
 
@@ -112,6 +112,8 @@ printf("+\n");
 }
 
 void capturedpieces(Board *b) {
+    b->blackcapturedcount = 0;
+    b->whitecapturedcount = 0;
     printf("\nCaptured Pieces:\n");
     printf("White captured: ");
     for (int i = 0; i < b->whitecapturedcount; i++) {
