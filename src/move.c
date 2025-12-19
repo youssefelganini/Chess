@@ -104,15 +104,19 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
 int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will put a condetion if castl[0]=='c' 
                                         still i want to ckeack the king square is chacked or not befor castling*/
     if(is_king_checked(board)!=1){
-        if(game->current_player==WHITE && board->whitekingmoved!=1 && board->whiterook_hmoved!=1 && board->whiterook_amoved!=1){
+        if(game->current_player==WHITE){
+            if(board->whitekingmoved!=1 && board->whiterook_hmoved!=1){
             if(castl[1]=='R'||castl[1]=='r'){
                 if(board->square[7][4].type==KING && board->square[7][7].type==ROOK){
                     if(!castling_path_clear(board, 7, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
-                    /* square[7][6]=K && square[7][5]=R */
+                    execute_move(board,7,4,7,6); /* square[7][6]=K */
+                    execute_move(board,7,7,7,5); /* square[7][5]=R */
                 }
+            }
+        }
                 else {
                     printf("You canot castle and you moved king or rook\n");
                     return 0;
@@ -120,13 +124,16 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
+                if(board->whitekingmoved!=1 && board->whiterook_amoved!=1){
                 if(board->square[7][4].type==KING && board->square[7][0].type==ROOK){
                     if(!castling_path_clear(board, 7, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
-                    /* square[7][2]=K && square[7][3]=R */
+                    execute_move(board,7,4,7,2); /*square[7][2]=K */
+                    execute_move(board,7,0,7,3); /*square[7][3]=R */
                 }
+            }
                 else {
                     printf("You canot castle and you moved king or rook\n");
                     return 0;
@@ -139,15 +146,18 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
             }
 
         }
-        else if(game->current_player==BLACK && board->blackkingmoved!=1 && board->blackrook_hmoved!=1 && board->blackrook_amoved!=1){
+        else if(game->current_player==BLACK){
             if(castl[1]=='R'||castl[1]=='r'){
+                if(board->blackkingmoved!=1 && board->blackrook_hmoved!=1){
                 if(board->square[0][4].type==KING && board->square[0][7].type==ROOK ){
                     if(!castling_path_clear(board, 0, 4, 7)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
-                    /* square[0][6]=K && square[0][5]=R */
+                    execute_move(board,0,4,0,6); /* square[0][6]=K */
+                    execute_move(board,0,7,0,5); /* square[0][5]=R */
                 }
+            }
                 else {
                     printf("You canot castle and you moved king or rook\n");
                     return 0;
@@ -155,13 +165,16 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
 
             }
             else if(castl[1]=='l'||castl[1]=='L'){
+                if(board->blackkingmoved!=1 && board->blackrook_amoved!=1){
                 if(board->square[0][4].type==KING && board->square[0][0].type==ROOK){
                     if(!castling_path_clear(board, 0, 4, 0)){
                         printf("Cannot castle, path blocked\n");
                         return 0;
                     }
-                         /*square[0][2]=K && square[0][3]=R */
+                         execute_move(board,0,4,0,2); /*square[0][2]=K */
+                         execute_move(board,0,0,0,3); /*square[0][3]=R */
                 }
+            }
                 else {
                     printf("You canot castle and you moved king or rook\n");
                     return 0;
@@ -175,7 +188,7 @@ int castling(Board *board, char *castl,Game *game){  /*when callilng fn we will 
 
         }
 
-    }
+    
     else{
         printf("You cannot castle and your king is checked\n");
         return 0;
@@ -307,7 +320,7 @@ int validation(char *x,Board *board, Game *game){
             return 1;                
             }
         }
-        if(input_as_int[3]==input_as_int[1]+1 &&input_as_int[0]==input_as_int[2]) {
+        if(input_as_int[3]==input_as_int[1]-1 &&input_as_int[0]==input_as_int[2]) {
            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                 printf("Canot move here the square is not empty\n");
                 return 0;
@@ -316,7 +329,7 @@ int validation(char *x,Board *board, Game *game){
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]+1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
+        if(input_as_int[3]==input_as_int[1]-1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
             if(board->square[input_as_int[3]][input_as_int[2]].color!=BLACK){
                 printf("This move is invalid\n");
                 return 0;
@@ -340,7 +353,7 @@ int validation(char *x,Board *board, Game *game){
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]-1 &&input_as_int[0]==input_as_int[2]) {
+        if(input_as_int[3]==input_as_int[1]+1 &&input_as_int[0]==input_as_int[2]) {
             if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
                 printf("Canot move here the square is not empty\n");
                 return 0;
@@ -349,7 +362,7 @@ int validation(char *x,Board *board, Game *game){
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]-1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
+        if(input_as_int[3]==input_as_int[1]+1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
             if(board->square[input_as_int[3]][input_as_int[2]].color!=WHITE){
                 printf("This move is invalid\n");
                 return 0;
@@ -373,7 +386,7 @@ void execute_move(Board *board, int from_row, int from_col,
     
  
     if (captured_piece.type != EMPTY) {
-        if (captured_piece.color == WHITE) {
+        if (captured_piece.color == BLACK) {
             board->blackcaptured[board->blackcapturedcount++] = captured_piece;
         } else {
             board->whitecaptured[board->whitecapturedcount++] = captured_piece;
@@ -406,3 +419,62 @@ void execute_move(Board *board, int from_row, int from_col,
         }
     }
 }
+
+
+/*----------------------------------------------------------------------------------------------------------*/
+
+void initialize_move_history(Move *move) {
+    move->move_count = 0;
+}
+void record_move(Move *move, Piece moved_piece, Piece captured_piece) {
+    move->movehistory[move->move_count][0] = moved_piece;
+    move->movehistory[move->move_count][1] = captured_piece;
+    move->move_count++;
+}
+void reverse_move(Board *board, int from_row, int from_col,
+                 int to_row, int to_col, Piece moved_piece, Piece captured_piece) {
+    board->square[from_row][from_col] = moved_piece;
+    board->square[to_row][to_col] = captured_piece;
+    if(captured_piece.type != EMPTY) {
+        if (captured_piece.color == WHITE) {
+            board->whitecapturedcount--;
+        } else {
+            board->blackcapturedcount--;
+        }
+    }
+}
+// void undo_move(Move *move, Board *board) {
+//     if (move->move_count == 0) {
+//         printf("No moves to undo.\n");
+//         return;
+//     }
+//     move->move_count--;
+//     Piece moved_piece = move->movehistory[move->move_count][0];
+//     Piece captured_piece = move->movehistory[move->move_count][1];
+//     if(moved_piece.type == EMPTY) {
+//         printf("No moves to undo.\n");
+//         return;
+//     }
+//     reverse_move(board, input_as_int[1], input_as_int[0],
+//                  input_as_int[3], input_as_int[2], moved_piece, captured_piece);
+// }
+// void redo_move(Move *move, Board *board) {
+//     if (move->move_count >= 100) {
+//         printf("No moves to redo.\n");
+//         return;
+//     }
+//     Piece moved_piece = move->movehistory[move->move_count][0];
+//     Piece captured_piece = move->movehistory[move->move_count][1];
+//     move->move_count++;
+//     if (moved_piece.type == EMPTY) {
+//         printf("No moves to redo.\n");
+//         return;
+//     }
+//     if(move->movehistory[move->move_count - 1][1].type != EMPTY) {
+//         if (captured_piece.color == WHITE) {
+//             board->blackcaptured[board->blackcapturedcount++] = captured_piece;
+//         } else {
+//             board->whitecaptured[board->whitecapturedcount++] = captured_piece;
+//         }
+//     }
+// }

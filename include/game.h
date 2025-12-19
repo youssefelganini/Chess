@@ -13,7 +13,6 @@ typedef struct {
     int state;
 } Game;
 
-void deattachinputs(char *x , int from_r , int to_r , int from_c ,int to_c );
 void init_game(Game *game);
 void game_loop(Game *game);
 int set_move(char *input, int *fromrow, int *fromcol,int *torow, int *tocol);

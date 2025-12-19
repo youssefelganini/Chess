@@ -1,7 +1,7 @@
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\pieces.h"
+#include"game.h"
+#include"board.h"
+#include"move.h"
+#include"pieces.h"
 #include<stdio.h>
 int main(){
     Game game;

@@ -2,6 +2,8 @@
 #include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
 #include<stdio.h>
 #include<string.h>
+#include<stdlib.h>
+#include"file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -30,7 +32,10 @@ void print_game_state(Game *game) {
 
 void game_loop(Game *game){
     printf("Welcome to Chess!\n");
+    printf("Commands:\n");
     printf("Enter moves in the format 'e2e4' to move a piece from e2 to e4.\n");
+    printf("Type 'save <filename>' to save the current game.\n");
+    printf("Type 'load <filename>' to load a saved game.\n");
     printf("Type 'exit' to quit the game.\n");
     char input[100];
     int fromrow ,torow,fromcol,tocol;
@@ -44,6 +49,27 @@ void game_loop(Game *game){
         if (strcmp(input,"exit\n")==0){
             printf("\ngoodbye\n");
             break;
+        }
+        if (strncmp(input, "save ", 5) == 0) {
+            char filename[95];
+            sscanf(input + 5, "%s", filename);
+            save_game(game, filename);
+            printf("======================================\n");
+            printf("Game saved to %s\n", filename);
+            continue;
+        }
+        if(strncmp(input, "load ", 5) == 0) {
+            char filename[95];
+            sscanf(input + 5, "%s", filename);
+            Game *loaded_game = load_game(filename);
+            if (loaded_game != NULL) {
+                *game = *loaded_game;
+                free(loaded_game);
+                printf("Game loaded from %s\n", filename);
+            } else {
+                printf("Failed to load game from %s\n", filename);
+            }
+            continue;
         }
         printf("======================================\n");
         convert_input_to_int(input);

@@ -1,5 +1,6 @@
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
+#include"board.h"
 #include<stdio.h>
+
 
 char boardlayout[8][8] = {
 {'-','.','-','.','-','.','-','.'},
@@ -33,6 +34,9 @@ void initboard(Board *b){
             b->square[i][j].color = EMPTY;
         }
     }
+
+    b->whitecapturedcount = 0;
+    b->blackcapturedcount = 0;
 }
 
 char piece_char(Piece p){
@@ -117,8 +121,6 @@ printf("\n");
 }
 
 void capturedpieces(Board *b) {
-    b->blackcapturedcount = 0;
-    b->whitecapturedcount = 0;
     printf("\nCaptured Pieces:\n");
     printf("White captured: ");
     for (int i = 0; i < b->whitecapturedcount; i++) {
