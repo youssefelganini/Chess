@@ -208,11 +208,11 @@ int enpasswn(Board *board, int from_row, int from_col,int to_row, int to_col){
     Piece moving_piece = board->square[from_row][from_col];
     if(moving_piece.type == PAWN && to_row == board->enpassen_row && to_col == board->enpassen_col){
         if(moving_piece.color == WHITE) {
-            board->whitecaptured[board->whitecapturedcount++] = board->square[board->enpassen_row + 1][board->enpassen_col];
+            board->blackcaptured[board->blackcapturedcount++] = board->square[board->enpassen_row + 1][board->enpassen_col];
             board->square[board->enpassen_row + 1][board->enpassen_col].type = EMPTY;
             board->square[board->enpassen_row + 1][board->enpassen_col].color = EMPTY;
         } else if(moving_piece.color == BLACK) {
-            board->blackcaptured[board->blackcapturedcount++] = board->square[board->enpassen_row - 1][board->enpassen_col];
+            board->whitecaptured[board->whitecapturedcount++] = board->square[board->enpassen_row - 1][board->enpassen_col];
             board->square[board->enpassen_row - 1][board->enpassen_col].type = EMPTY;
             board->square[board->enpassen_row - 1][board->enpassen_col].color = EMPTY;
         }
