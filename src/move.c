@@ -1,9 +1,9 @@
-#include "/mnt/d/study/programming/Project/Chess/include/move.h"
+#include "C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\move.h"
 #include<math.h>
 #include<stdio.h>
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\board.h"
 #include <stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\game.h"
 
 int flag=0;
 int counter=0;
@@ -396,7 +396,7 @@ void execute_move(Board *board, int from_row, int from_col,
     if(moving_piece.type == KING) {
         if(moving_piece.color == WHITE) {
             board->whitekingmoved = 1;
-        } else {
+        } else if(moving_piece.color == BLACK) {
             board->blackkingmoved = 1;
         }
     } else if(moving_piece.type == ROOK) {
@@ -413,6 +413,11 @@ void execute_move(Board *board, int from_row, int from_col,
                 board->blackrook_hmoved = 1;
             }
         }
+    }
+    
+    if(enpasswn(board)){
+        board->square[board->enpassen_row][board->enpassen_col].type=EMPTY;
+        board->square[board->enpassen_row][board->enpassen_col].color=EMPTY;
     }
 }
 

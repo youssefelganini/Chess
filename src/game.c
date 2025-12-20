@@ -1,9 +1,9 @@
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
+#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\game.h"
+#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
