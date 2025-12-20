@@ -93,13 +93,13 @@ void game_loop(Game *game){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
             else printf("YOUR KING WILL BE IN CHECK!\n");
-            fgets(input,100,stdin);
-            convert_input_to_int(input);
-            fromcol = input_as_int[0];
-            fromrow = input_as_int[1];
-            tocol = input_as_int[2];
-            torow = input_as_int[3];
-            execute_move(&game->board,fromrow,fromcol,torow,tocol);
+            reverse_move(&game->board,fromrow,fromcol,torow,tocol,
+                         game->board.square[torow][tocol],
+                         game->board.square[fromrow][fromcol]);
+            printf("Please enter a valid move:\n");
+            if(fgets(input,100,stdin) == NULL){
+                break;
+            }
             
         }
         change_pawn(&game->board);
