@@ -96,6 +96,7 @@ void game_loop(Game *game){
             reverse_move(&game->board,fromrow,fromcol,torow,tocol,
                          game->board.square[torow][tocol],
                          game->board.square[fromrow][fromcol]);
+                         continue;
         }
         change_pawn(&game->board);
 
