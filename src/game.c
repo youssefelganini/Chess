@@ -89,18 +89,13 @@ void game_loop(Game *game){
 
         enpasswn(&game->board,fromrow,fromcol,torow,tocol);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
-        while(is_king_checked(&game->board,game)){
+        if(is_king_checked(&game->board,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
             else printf("YOUR KING WILL BE IN CHECK!\n");
             reverse_move(&game->board,fromrow,fromcol,torow,tocol,
                          game->board.square[torow][tocol],
                          game->board.square[fromrow][fromcol]);
-            printf("Please enter a valid move:\n");
-            if(fgets(input,100,stdin) == NULL){
-                break;
-            }
-            
         }
         change_pawn(&game->board);
 
