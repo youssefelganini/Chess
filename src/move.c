@@ -1,9 +1,9 @@
-#include "C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\move.h"
+#include "C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
 #include<math.h>
 #include<stdio.h>
-#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\board.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
 #include <stdlib.h>
-#include"C:\\Users\\Mega Store\\Desktop\\Uni\\Prog\\project\\Chess\\include\\game.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
 
 int flag=0;
 int counter=0;
@@ -415,7 +415,7 @@ void execute_move(Board *board, int from_row, int from_col,
         }
     }
     
-    if(enpasswn(board)){
+    if(enpasswn(board) && moving_piece.type == PAWN) {
         board->square[board->enpassen_row][board->enpassen_col].type=EMPTY;
         board->square[board->enpassen_row][board->enpassen_col].color=EMPTY;
     }

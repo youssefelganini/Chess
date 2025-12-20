@@ -1,8 +1,8 @@
-#include"file_io.h"
+#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\file_io.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "board.h"
-#include "game.h"
+#include "C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
+#include "C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
 void save_game(Game *game, const char *filename) {
     FILE *file = fopen(filename, "wb");
     if (file == NULL) {
