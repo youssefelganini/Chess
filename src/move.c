@@ -562,7 +562,7 @@ void execute_move(Board *board, int from_row, int from_col,
 
 /*----------------------------------------------SAVE/REDO/UNDO/LOAD------------------------------------------------*/
 
-/*void initialize_move_history(Move *move) {
+void initialize_move_history(Move *move) {
     move->move_count = 0;
 }
 void record_move(Move *move, Piece moved_piece, Piece captured_piece) {
@@ -581,7 +581,7 @@ void reverse_move(Board *board, int from_row, int from_col,
             board->blackcapturedcount--;
         }
     }
-}*/
+}
 // void undo_move(Move *move, Board *board) {
 //     if (move->move_count == 0) {
 //         printf("No moves to undo.\n");
