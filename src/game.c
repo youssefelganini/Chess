@@ -1,9 +1,9 @@
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\game.h"
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\file_io.h"
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -21,13 +21,16 @@ void init_game(Game *game) {
 void print_game_state(Game *game) {
     displayboard(&game->board);
     capturedpieces(&game->board);
+    game->flag=0;
     
     printf("\nCurrent player: %s\n", 
            game->current_player == WHITE ? "White" : "Black");
+           
     
-    // if (/*king is in check*/) {
-    //     printf("CHECK!\n");
-    // }
+     if (is_king_checked(&game->board,game)) {
+         printf("CHECK!\n");
+         game->flag=1;
+     }
 }
 
 void game_loop(Game *game){
@@ -79,11 +82,28 @@ void game_loop(Game *game){
         fromrow = input_as_int[1];
         tocol = input_as_int[2];
         torow = input_as_int[3];
-        if (!validation(input,&game->board, game)) {
+
+        if (!validation(input,&game->board, game,fromrow,fromcol,torow,tocol)) {
             continue;
         }
-        enpasswn(&game->board);
+
+        enpasswn(&game->board,fromrow,fromcol,torow,tocol);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
+        while(is_king_checked(&game->board,game)){
+            if(game->flag==1){
+                printf("YOUR KING IS STILL IN CHECK!\n");}
+            else printf("YOUR KING WILL BE IN CHECK!\n");
+            fgets(input,100,stdin);
+            convert_input_to_int(input);
+            fromcol = input_as_int[0];
+            fromrow = input_as_int[1];
+            tocol = input_as_int[2];
+            torow = input_as_int[3];
+            execute_move(&game->board,fromrow,fromcol,torow,tocol);
+            
+        }
+        change_pawn(&game->board);
+
 
         if (game->current_player == WHITE){
             game->current_player = BLACK;

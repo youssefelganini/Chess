@@ -18,6 +18,10 @@ typedef struct
     int blackrook_hmoved;
     int enpassen_row;
     int enpassen_col;
+    int wkingsq[2];
+    int bkingsq[2];
+    int tempb[2];
+    int tempw[2];
 }Board;
 
 

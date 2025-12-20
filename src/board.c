@@ -1,4 +1,4 @@
-#include"C:\Users\Mega Store\Desktop\Uni\Prog\project\Chess\include\board.h"
+#include"/mnt/d/study/programming/Project/Chess/include/board.h"
 #include<stdio.h>
 
 

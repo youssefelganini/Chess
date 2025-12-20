@@ -11,6 +11,7 @@ typedef struct {
     Board board;
     int current_player;
     int state;
+    int flag;
 } Game;
 
 void init_game(Game *game);
