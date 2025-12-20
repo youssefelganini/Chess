@@ -414,10 +414,15 @@ void execute_move(Board *board, int from_row, int from_col,
             }
         }
     }
-    
-    if(enpasswn(board) && moving_piece.type == PAWN) {
-        board->square[board->enpassen_row][board->enpassen_col].type=EMPTY;
-        board->square[board->enpassen_row][board->enpassen_col].color=EMPTY;
+
+    if(moving_piece.type == PAWN && to_row == board->enpassen_row && to_col == board->enpassen_col) {
+        if(moving_piece.color == WHITE) {
+            board->square[board->enpassen_row - 1][board->enpassen_col].type = EMPTY;
+            board->square[board->enpassen_row - 1][board->enpassen_col].color = EMPTY;
+        } else if(moving_piece.color == BLACK) {
+            board->square[board->enpassen_row + 1][board->enpassen_col].type = EMPTY;
+            board->square[board->enpassen_row + 1][board->enpassen_col].color = EMPTY;
+        }
     }
 }
 
