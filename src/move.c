@@ -1,9 +1,9 @@
-#include "/mnt/d/study/programming/Project/Chess/include/move.h"
+#include "move.h"
 #include<math.h>
 #include<stdio.h>
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"board.h"
 #include <stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"game.h"
 
 
 
@@ -378,8 +378,9 @@ int no_king_can_move(Board *board, Game *game){
             int still_checked=is_king_checked(board, game);
             board->wkingsq[0]=board->cmtempw[0];
             board->wkingsq[1]=board->cmtempw[1];
-            board->square[board->cmtempw[0]][board->cmtempw[1]]=board->square[new_row][new_col];
-            board->square[new_row][new_col] = temp_piece;
+            reverse_move(board,new_row,new_col,board->cmtempw[0],board->cmtempw[1],
+                         board->square[board->cmtempw[0]][board->cmtempw[1]],
+                         temp_piece);
             
             if(still_checked==0) {
                 return 0;
