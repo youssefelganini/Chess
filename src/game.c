@@ -1,9 +1,9 @@
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
+#include"game.h"
+#include"move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include"file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -42,8 +42,9 @@ void game_loop(Game *game){
     printf("Type 'exit' to quit the game.\n");
     char input[100];
     int fromrow ,torow,fromcol,tocol;
+    Move move;
     while(game->state == ONGOING){
-
+        initialize_move_history(&move);
         print_game_state(game);
         printf("\nEnter :");
         if(fgets(input,100,stdin) == NULL){
@@ -76,6 +77,17 @@ void game_loop(Game *game){
             continue;
         }
         printf("======================================\n");
+
+        if(strncmp(input,"undo",4)==0){
+            undo_move(&move,&game->board);
+            continue;
+        }
+
+        if(strncmp(input,"redo",4)==0){
+            redo_move(&move,&game->board);
+            continue;
+        }
+
         castling(&game->board,input,game);
         convert_input_to_int(input);
         fromcol = input_as_int[0];

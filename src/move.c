@@ -1,9 +1,9 @@
-#include "/mnt/d/study/programming/Project/Chess/include/move.h"
+#include "move.h"
 #include<math.h>
 #include<stdio.h>
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"board.h"
 #include <stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"game.h"
 
 
 
@@ -582,38 +582,51 @@ void reverse_move(Board *board, int from_row, int from_col,
         }
     }
 }
-// void undo_move(Move *move, Board *board) {
-//     if (move->move_count == 0) {
-//         printf("No moves to undo.\n");
-//         return;
-//     }
-//     move->move_count--;
-//     Piece moved_piece = move->movehistory[move->move_count][0];
-//     Piece captured_piece = move->movehistory[move->move_count][1];
-//     if(moved_piece.type == EMPTY) {
-//         printf("No moves to undo.\n");
-//         return;
-//     }
-//     reverse_move(board, input_as_int[1], input_as_int[0],
-//                  input_as_int[3], input_as_int[2], moved_piece, captured_piece);
-// }
-// void redo_move(Move *move, Board *board) {
-//     if (move->move_count >= 100) {
-//         printf("No moves to redo.\n");
-//         return;
-//     }
-//     Piece moved_piece = move->movehistory[move->move_count][0];
-//     Piece captured_piece = move->movehistory[move->move_count][1];
-//     move->move_count++;
-//     if (moved_piece.type == EMPTY) {
-//         printf("No moves to redo.\n");
-//         return;
-//     }
-//     if(move->movehistory[move->move_count - 1][1].type != EMPTY) {
-//         if (captured_piece.color == WHITE) {
-//             board->blackcaptured[board->blackcapturedcount++] = captured_piece;
-//         } else {
-//             board->whitecaptured[board->whitecapturedcount++] = captured_piece;
-//         }
-//     }
-// }
+void undo_move(Move *move, Board *board) {
+    if (move->move_count == 0) {
+        printf("No moves to undo.\n");
+        return;
+    }
+    move->move_count--;
+    Piece moved_piece = move->movehistory[move->move_count][0];
+    Piece captured_piece = move->movehistory[move->move_count][1];
+    if(moved_piece.type == EMPTY) {
+        printf("No moves to undo.\n");
+        return;
+    }
+    reverse_move(board, input_as_int[1], input_as_int[0],
+                 input_as_int[3], input_as_int[2], moved_piece, captured_piece);
+    if(captured_piece.type != EMPTY) {
+        if (captured_piece.color == WHITE) {
+            board->whitecapturedcount--;
+        } else {
+            board->blackcapturedcount--;
+        }
+    }
+    move->movehistory[move->move_count][0] = (Piece){EMPTY, EMPTY};
+    move->movehistory[move->move_count][1] = (Piece){EMPTY, EMPTY};
+}
+void redo_move(Move *move, Board *board) {
+    if (move->move_count >= 100) {
+        printf("No moves to redo.\n");
+        return;
+    }
+    Piece moved_piece = move->movehistory[move->move_count][0];
+    Piece captured_piece = move->movehistory[move->move_count][1];
+    move->move_count++;
+    if (moved_piece.type == EMPTY) {
+        printf("No moves to redo.\n");
+        return;
+    }
+    if(move->movehistory[move->move_count - 1][1].type != EMPTY) {
+        if (captured_piece.color == WHITE) {
+            board->blackcaptured[board->blackcapturedcount++] = captured_piece;
+        } else {
+            board->whitecaptured[board->whitecapturedcount++] = captured_piece;
+        }
+    }
+    execute_move(board, input_as_int[1], input_as_int[0],
+                 input_as_int[3], input_as_int[2]);
+    move->movehistory[move->move_count - 1][0] = moved_piece;
+    move->movehistory[move->move_count - 1][1] = captured_piece;
+}
