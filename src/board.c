@@ -14,6 +14,10 @@ char boardlayout[8][8] = {
 
 char boardColor[2] = {'.','-'};
 void initboard(Board *b){
+    b->wkingsq[0]=7;
+    b->wkingsq[1]=4;
+    b->bkingsq[0]=0;
+    b->bkingsq[1]=4;
     int ppos[8] = {ROOK , KNIGHT , BISHOP , QUEEN , KING , BISHOP , KNIGHT , ROOK };
 
     for(int i = 0 ; i < bsize ; ++i){

@@ -22,6 +22,8 @@ typedef struct
     int bkingsq[2];
     int tempb[2];
     int tempw[2];
+    int ktempw[2];
+    int ktempb[2];
 }Board;
 
 

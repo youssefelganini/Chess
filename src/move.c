@@ -1,18 +1,16 @@
-#include "move.h"
+#include "/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"
+#include"/mnt/d/study/programming/Project/Chess/include/board.h"
 #include <stdlib.h>
-#include"game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
 
 
 
-/*we didnot write in validition if teh rook return 0 what it will print
-x is the input
-a  has the values of the input as int
-c array for castling
-checkoftheking
+/*
+2-kings logic
 checkmate
+stalmate{2loops(King vs King),(ing + Bishop vs King),(King + Knight vs King),(King + Bishop + Bishop (both same color) vs King)}
 */
 
 
@@ -37,10 +35,21 @@ int rook(int from_row,int from_col,int to_row,int to_col){ /*input=[a,3,a,4]*/
     if(from_col!=to_col&&from_row==to_row) return 1;
     return 0;
 }
-int king(int from_row,int from_col,int to_row,int to_col){
-    if(abs(from_col-to_col)<=1 &&
-        abs(from_row-to_row)<=1) return 1;
-
+int king(Board *board,Game *game,int from_row,int from_col,int to_row,int to_col){
+    int enrow;
+    int encol;
+    if(game->current_player==WHITE){
+        enrow=board->bkingsq[0];
+        encol=board->bkingsq[1];
+    }
+    else{
+        enrow=board->wkingsq[0];
+        encol=board->wkingsq[1];
+    }
+ if(abs(from_col-to_col)<=1 &&
+       abs(from_row-to_row)<=1 &&
+        (abs(to_row-enrow)>1||abs(to_col-encol)>1))
+        return 1;
     return 0;
 }
 
@@ -97,10 +106,6 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
 int castling(Board *board,char *castl,Game *game){
     convert_input_to_int(castl);
     char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]);
-    if(game->flag==1){
-        printf("You cannot castle while your king is in check\n");
-        return 0;
-    }
     if(game->current_player==WHITE){
         if(piece!='K') return 0;
         if(input_as_int[2]==6&&input_as_int[3]==7){
@@ -111,6 +116,10 @@ int castling(Board *board,char *castl,Game *game){
             if(board->square[7][4].type!=KING||board->square[7][7].type!=ROOK) return 0;
             if(!castling_path_clear(board,7,4,7)){
                 printf("Cannot castle, path blocked\n");
+                return 0;
+            }
+            if(game->flag==1){
+                printf("You cannot castle while your king is in check\n");
                 return 0;
             }
             execute_move(board,7,4,7,6);
@@ -124,6 +133,10 @@ int castling(Board *board,char *castl,Game *game){
             if(board->square[7][4].type!=KING||board->square[7][0].type!=ROOK) return 0;
             if(!castling_path_clear(board,7,4,0)){
                 printf("Cannot castle, path blocked\n");
+                return 0;
+            }
+            if(game->flag==1){
+                printf("You cannot castle while your king is in check\n");
                 return 0;
             }
             execute_move(board,7,4,7,2);
@@ -144,6 +157,10 @@ int castling(Board *board,char *castl,Game *game){
                 printf("Cannot castle, path blocked\n");
                 return 0;
             }
+            if(game->flag==1){
+                printf("You cannot castle while your king is in check\n");
+                return 0;
+            }
             execute_move(board,0,4,0,6);
             execute_move(board,0,7,0,5);
             return 1;
@@ -155,6 +172,10 @@ int castling(Board *board,char *castl,Game *game){
             if(board->square[0][4].type!=KING||board->square[0][0].type!=ROOK) return 0;
             if(!castling_path_clear(board,0,4,0)){
                 printf("Cannot castle, path blocked\n");
+                return 0;
+            }
+            if(game->flag==1){
+                printf("You cannot castle while your king is in check\n");
                 return 0;
             }
             execute_move(board,0,4,0,2);
@@ -235,28 +256,23 @@ int enpasswn(Board *board, int from_row, int from_col,int to_row, int to_col){
 /*----------------------------------------------KING CHECK------------------------------------------------*/
 
 void where_is_the_king(Board *board){
-    if(board->whitekingmoved!=1){
-        board->wkingsq[0]=7;
-        board->wkingsq[1]=4;
-    }
-    else{
-        if(board->square[input_as_int[1]][input_as_int[0]].type==KING &&board->square[input_as_int[1]][input_as_int[0]].color==WHITE ){
-            board->wkingsq[0]=input_as_int[3];
-            board->wkingsq[1]=input_as_int[2];
-        }
-    }
-    if(board->blackkingmoved!=1){
-        board->bkingsq[0]=0;
-        board->bkingsq[1]=4;
-    }
-    else{
-        if(board->square[input_as_int[1]][input_as_int[0]].type==KING &&board->square[input_as_int[1]][input_as_int[0]].color==BLACK){
-            board->bkingsq[0]=input_as_int[3];
-            board->bkingsq[1]=input_as_int[2];
 
-        }
+    board->ktempb[0]=board->bkingsq[0];
+    board->ktempb[1]=board->bkingsq[1];
+    board->tempw[0]=board->wkingsq[0];
+    board->tempw[1]=board->wkingsq[1];
+    
+    if(board->square[input_as_int[3]][input_as_int[2]].type==KING &&board->square[input_as_int[3]][input_as_int[2]].color==WHITE ){
+        board->wkingsq[0]=input_as_int[3];
+        board->wkingsq[1]=input_as_int[2];
+    }
+
+    else if(board->square[input_as_int[3]][input_as_int[2]].type==KING &&board->square[input_as_int[3]][input_as_int[2]].color==BLACK){
+        board->bkingsq[0]=input_as_int[3];
+        board->bkingsq[1]=input_as_int[2];
     }
 }
+
 
 
 int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col){
@@ -442,7 +458,7 @@ int validation(char *x,Board *board, Game *game,int from_row,int from_col,int to
     case 'K':
     case 'k':
         
-        return king(from_row,from_col,to_row,to_col);
+        return king(board,game,from_row,from_col,to_row,to_col);
     case 'P':
          if(x[1]=='2'  && x[0]==x[2] ){
             if(x[3]=='4'){

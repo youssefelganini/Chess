@@ -1,9 +1,9 @@
-#include"game.h"
-#include"move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"file_io.h"
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -104,10 +104,17 @@ void game_loop(Game *game){
         if(is_king_checked(&game->board,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
-            else printf("YOUR KING WILL BE IN CHECK!\n");
+            else {
+                printf("YOUR KING WILL BE IN CHECK!\n");
+                game->board.bkingsq[0]=game->board.ktempb[0];
+                game->board.bkingsq[1]=game->board.ktempb[1];
+                game->board.wkingsq[0]=game->board.tempw[0];
+                game->board.wkingsq[0]=game->board.tempw[1];
+            }
             reverse_move(&game->board,fromrow,fromcol,torow,tocol,
                          game->board.square[torow][tocol],
                          game->board.square[fromrow][fromcol]);
+                        
                          continue;
         }
         change_pawn(&game->board);
