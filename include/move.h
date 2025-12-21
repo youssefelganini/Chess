@@ -30,7 +30,10 @@ int change_pawn(Board *board);
 void where_is_the_king(Board *board);
 int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col);
 int is_king_checked(Board *board,Game *game);
-int validation(char *x,Board *board, Game *game,int from_row,int from_col,int to_row,int to_col);
+int no_check_blocked_orCaptured(Board *board,Game *game);
+int no_king_king_move(Board *board,Game *game);
+int chekmate(Board *board,Game *game);
+int validation(Board *board, Game *game,int from_row,int from_col,int to_row,int to_col);
 void initialize_move_history(Move *move);
 void reverse_move(Board *board, int from_row, int from_col,
                  int to_row, int to_col, Piece moved_piece, Piece captured_piece);

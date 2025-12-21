@@ -31,6 +31,7 @@ void print_game_state(Game *game) {
          printf("CHECK!\n");
          game->flag=1;
      }
+
 }
 
 void game_loop(Game *game){
@@ -44,8 +45,15 @@ void game_loop(Game *game){
     int fromrow ,torow,fromcol,tocol;
     Move move;
     while(game->state == ONGOING){
+
         initialize_move_history(&move);
         print_game_state(game);
+                      change_pawn(&game->board);
+                             if(chekmate(&game->board,game)){
+            printf("WON");
+            break;
+            }
+
         printf("\nEnter :");
         if(fgets(input,100,stdin) == NULL){
             break;
@@ -95,12 +103,14 @@ void game_loop(Game *game){
         tocol = input_as_int[2];
         torow = input_as_int[3];
 
-        if (!validation(input,&game->board, game,fromrow,fromcol,torow,tocol)) {
+
+        if (!validation(&game->board, game,fromrow,fromcol,torow,tocol)) {
             continue;
         }
 
         enpasswn(&game->board,fromrow,fromcol,torow,tocol);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
+  
         if(is_king_checked(&game->board,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
@@ -108,8 +118,8 @@ void game_loop(Game *game){
                 printf("YOUR KING WILL BE IN CHECK!\n");
                 game->board.bkingsq[0]=game->board.ktempb[0];
                 game->board.bkingsq[1]=game->board.ktempb[1];
-                game->board.wkingsq[0]=game->board.tempw[0];
-                game->board.wkingsq[0]=game->board.tempw[1];
+                game->board.wkingsq[0]=game->board.ktempw[0];
+                game->board.wkingsq[0]=game->board.ktempw[1];
             }
             reverse_move(&game->board,fromrow,fromcol,torow,tocol,
                          game->board.square[torow][tocol],
@@ -117,7 +127,7 @@ void game_loop(Game *game){
                         
                          continue;
         }
-        change_pawn(&game->board);
+
 
 
         if (game->current_player == WHITE){
