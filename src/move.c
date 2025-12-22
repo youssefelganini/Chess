@@ -1,9 +1,9 @@
-#include "move.h"
+#include "/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"
+#include"/mnt/d/study/programming/Project/Chess/include/board.h"
 #include <stdlib.h>
-#include"game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
 
 
 
@@ -101,7 +101,7 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
         }
         x += dx;
     }
-    return 1;
+    return 1; 
 }
 int castling(Board *board,char *castl,Game *game){
     convert_input_to_int(castl);
@@ -405,8 +405,9 @@ int no_king_can_move(Board *board, Game *game){
             int still_checked = is_king_checked(board, game);
             board->bkingsq[0] = board->cmtempb[0];
             board->bkingsq[1] = board->cmtempb[1];
-            board->square[board->cmtempb[0]][board->cmtempb[1]] = board->square[new_row][new_col];
-            board->square[new_row][new_col] = temp_piece;
+            reverse_move(board,new_row,new_col,board->cmtempb[0],board->cmtempb[1],
+                         board->square[board->cmtempb[0]][board->cmtempb[1]],
+                         temp_piece);
             if(still_checked==0) {
                 return 0;
             }
@@ -421,6 +422,7 @@ int no_check_blocked_orCaptured(Board *board,Game *game){
     for(int from_row=0;from_row<8;from_row++){
         for(int from_col=0;from_col<8;from_col++){
             if(board->square[from_row][from_col].color!=color) continue;
+            if(board->square[from_row][from_col].type==KING) continue;
             
             for(int to_row=0;to_row<8;to_row++){
                 for(int to_col=0;to_col<8;to_col++){
@@ -428,12 +430,8 @@ int no_check_blocked_orCaptured(Board *board,Game *game){
                     Piece temp=board->square[to_row][to_col];
                     execute_move(board,from_row,from_col,to_row,to_col);
                     int still_checked= is_king_checked(board,game);
-                    execute_move(board,to_row,to_col,from_row,from_col);
-                    board->square[to_row][to_col]=temp;
-                    board->wkingsq[0] = board->cmtempw[0];
-                    board->wkingsq[1] = board->cmtempw[1];
-                    board->bkingsq[0] = board->cmtempb[0];
-                    board->bkingsq[1] = board->cmtempb[1];
+                    reverse_move(board,from_row,from_col,to_row,to_col,board->square[to_row][to_col],temp);
+
                     if(still_checked==0) return 0;
 
                 }
@@ -622,17 +620,40 @@ void record_move(Move *move, Piece moved_piece, Piece captured_piece) {
 }
 void reverse_move(Board *board, int from_row, int from_col,
                  int to_row, int to_col, Piece moved_piece, Piece captured_piece) {
+                    printf("XY");
     board->square[from_row][from_col] = moved_piece;
     board->square[to_row][to_col] = captured_piece;
-    if(captured_piece.type != EMPTY) {
+if(captured_piece.type != EMPTY) {
         if (captured_piece.color == WHITE) {
+            board->whitecaptured[board->whitecapturedcount] = (Piece){EMPTY, EMPTY};
+            printf("Debug");
             board->whitecapturedcount--;
         } else {
+            board->blackcaptured[board->blackcapturedcount] = (Piece){EMPTY, EMPTY};
             board->blackcapturedcount--;
+            printf("Debug");
         }
     }
 }
-void undo_move(Move *move, Board *board) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void undo_move(Move *move, Board *board){
     if (move->move_count == 0) {
         printf("No moves to undo.\n");
         return;

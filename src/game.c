@@ -1,9 +1,9 @@
-#include"game.h"
-#include"move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"file_io.h"
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -47,6 +47,7 @@ void game_loop(Game *game){
     while(game->state == ONGOING){
 
         initialize_move_history(&move);
+        record_move(&move,(Piece){EMPTY, EMPTY}, (Piece){EMPTY, EMPTY});
         print_game_state(game);
                       change_pawn(&game->board);
                              if(chekmate(&game->board,game)){
@@ -96,7 +97,7 @@ void game_loop(Game *game){
             continue;
         }
 
-        castling(&game->board,input,game);
+       
         convert_input_to_int(input);
         fromcol = input_as_int[0];
         fromrow = input_as_int[1];
@@ -105,9 +106,18 @@ void game_loop(Game *game){
 
 
         if (!validation(&game->board, game,fromrow,fromcol,torow,tocol)) {
+            if(castling(&game->board,input,game)){
+                if (game->current_player == WHITE){
+                game->current_player = BLACK;
+                 }
+                else{
+                 game->current_player = WHITE;
+                } 
+                continue;  
+            }
             continue;
         }
-
+        
         enpasswn(&game->board,fromrow,fromcol,torow,tocol);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
   
@@ -116,16 +126,15 @@ void game_loop(Game *game){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
             else {
                 printf("YOUR KING WILL BE IN CHECK!\n");
-                game->board.bkingsq[0]=game->board.ktempb[0];
+                /*game->board.bkingsq[0]=game->board.ktempb[0];
                 game->board.bkingsq[1]=game->board.ktempb[1];
                 game->board.wkingsq[0]=game->board.ktempw[0];
-                game->board.wkingsq[0]=game->board.ktempw[1];
+                game->board.wkingsq[0]=game->board.ktempw[1];*/
             }
-            reverse_move(&game->board,fromrow,fromcol,torow,tocol,
-                         game->board.square[torow][tocol],
-                         game->board.square[fromrow][fromcol]);
-                        
-                         continue;
+                            reverse_move(&game->board,fromrow,fromcol,torow,tocol,
+                game->board.square[torow][tocol],
+                game->board.square[fromrow][fromcol]);
+            continue;
         }
 
 
