@@ -1,9 +1,9 @@
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
+#include"game.h"
+#include"move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include"file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -44,13 +44,12 @@ void game_loop(Game *game){
     char input[100];
     int fromrow ,torow,fromcol,tocol;
     Move move;
+    initialize_move_history(&move);
     while(game->state == ONGOING){
 
-        initialize_move_history(&move);
-        record_move(&move,(Piece){EMPTY, EMPTY}, (Piece){EMPTY, EMPTY});
         print_game_state(game);
-                      change_pawn(&game->board);
-                             if(chekmate(&game->board,game)){
+        change_pawn(&game->board);
+        if(chekmate(&game->board,&move,game)){
             printf("WON");
             break;
             }
@@ -89,6 +88,12 @@ void game_loop(Game *game){
 
         if(strncmp(input,"undo",4)==0){
             undo_move(&move,&game->board);
+            if(game->current_player == WHITE){
+                game->current_player = BLACK;
+            }
+            else{
+                game->current_player = WHITE;
+            }
             continue;
         }
 
@@ -119,8 +124,8 @@ void game_loop(Game *game){
         }
         
         enpasswn(&game->board,fromrow,fromcol,torow,tocol);
-        execute_move(&game->board,fromrow,fromcol,torow,tocol);
-  
+        Board tempboard = game->board;
+        execute_move(&tempboard,fromrow,fromcol,torow,tocol);
         if(is_king_checked(&game->board,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
@@ -131,13 +136,18 @@ void game_loop(Game *game){
                 game->board.wkingsq[0]=game->board.ktempw[0];
                 game->board.wkingsq[0]=game->board.ktempw[1];*/
             }
-                            reverse_move(&game->board,fromrow,fromcol,torow,tocol,
-                game->board.square[torow][tocol],
-                game->board.square[fromrow][fromcol]);
             continue;
         }
 
-
+        move.from_row = fromrow;
+        move.from_col = fromcol;
+        move.to_row = torow;
+        move.to_col = tocol;
+        move.moved_piece = game->board.square[fromrow][fromcol];
+        move.captured_piece = game->board.square[torow][tocol];
+        
+        execute_move(&game->board,fromrow,fromcol,torow,tocol);
+        record_move(&move, fromrow, fromcol, torow, tocol, move.moved_piece, move.captured_piece);
 
         if (game->current_player == WHITE){
             game->current_player = BLACK;

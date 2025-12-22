@@ -1,7 +1,7 @@
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
-#include"/mnt/d/study/programming/Project/Chess/include/pieces.h"
+#include"game.h"
+#include"board.h"
+#include"move.h"
+#include"pieces.h"
 #include<stdio.h>
 int main(){
     Game game;
