@@ -23,7 +23,7 @@ int queen(int from_row,int from_col,int to_row,int to_col);
 int path_check(Board *board,int from_row,int from_col,int to_row,int to_col);
 int dest_check(Board *board,int from_row,int from_col,int to_row,int to_col);
 int castling_path_clear(Board *board,int king_row,int king_col,int rook_col);
-int castling(Board *board,char *castl,Game *game);
+int castling(Board *temboard,char *castl,Game *game,Board *board);
 int pawn_promotion(Board *board);
 int enpasswn(Board *board,int fromrow,int fromcol,int torow,int tocol);
 int change_pawn(Board *board);

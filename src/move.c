@@ -1,10 +1,9 @@
-#include "move.h"
+#include "/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"
+#include"/mnt/d/study/programming/Project/Chess/include/board.h"
 #include <stdlib.h>
-#include"game.h"
-
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
 
 
 /*
@@ -104,9 +103,13 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
     }
     return 1; 
 }
-int castling(Board *board,char *castl,Game *game){
+int castling(Board *tempboard,char *castl,Game *game,Board *board){
     convert_input_to_int(castl);
     char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]);
+    execute_move(tempboard,input_as_int[1],input_as_int[0],input_as_int[3],input_as_int[2]);
+    if(is_king_checked(tempboard,game)) {
+        printf("YOUR KING WILL BE CHECKED!");
+        return 0;} 
     if(game->current_player==WHITE){
         if(piece!='K') return 0;
         if(input_as_int[2]==6&&input_as_int[3]==7){
@@ -441,14 +444,18 @@ int chekmate(Board *board,Move *move,Game *game){
 }
 /*----------------------------------------------STALMATE&DRAW------------------------------------------------*/
 int stalmate(Board *board,Game *game){
-    if(is_king_checked(board,game)==1) return 0; 
+    if(is_king_checked(board,game)) return 0; 
     int color=game->current_player;
     for(int from_row=0;from_row<8;from_row++){
         for(int from_col=0;from_col<8;from_col++){
             if(board->square[from_row][from_col].color!=color) continue;
             for(int to_row=0;to_row<8;to_row++){
                 for(int to_col=0;to_col<8;to_col++){
-                    if(validation(board,game,from_row,from_col,to_row,to_col)) return 0;
+                    if(validation(board,game,from_row,from_col,to_row,to_col)){
+                        execute_move(board,from_row,from_col,to_col,to_col);
+                        if(is_king_checked(board,game)==0) return 0;
+
+                    }
                 }
             }
         }

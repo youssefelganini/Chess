@@ -1,9 +1,9 @@
-#include"game.h"
-#include"move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"file_io.h"
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -25,13 +25,6 @@ void print_game_state(Game *game) {
     
     printf("\nCurrent player: %s\n", 
            game->current_player == WHITE ? "White" : "Black");
-           
-    
-     if (is_king_checked(&game->board,game)) {
-         printf("CHECK!\n");
-         game->flag=1;
-     }
-
 }
 
 void game_loop(Game *game){
@@ -46,13 +39,26 @@ void game_loop(Game *game){
     Move move;
     initialize_move_history(&move);
     while(game->state == ONGOING){
-
-        print_game_state(game);
+        
         change_pawn(&game->board);
+        print_game_state(game);
+        
+         Board tempboard = game->board;
+
+
         if(chekmate(&game->board,&move,game)){
             printf("WON");
             break;
-            }
+        }
+        if(stalmate(&tempboard,game)||draw(&game->board,game)){
+            printf("DRAW!");
+            break;
+        } 
+        if (is_king_checked(&game->board,game)) {
+            printf("CHECK!\n");
+            game->flag=1;
+        }      
+
 
         printf("\nEnter :");
         if(fgets(input,100,stdin) == NULL){
@@ -110,23 +116,25 @@ void game_loop(Game *game){
         torow = input_as_int[3];
 
 
+         if(castling(&tempboard,input,game,&game->board)){
+             if (game->current_player == WHITE){
+             game->current_player = BLACK;
+             }
+             else{
+             game->current_player = WHITE;
+             } 
+             continue;  
+         }
+
         if (!validation(&game->board, game,fromrow,fromcol,torow,tocol)) {
-            if(castling(&game->board,input,game)){
-                if (game->current_player == WHITE){
-                game->current_player = BLACK;
-                 }
-                else{
-                 game->current_player = WHITE;
-                } 
-                continue;  
-            }
             continue;
         }
+
         
         enpasswn(&game->board,fromrow,fromcol,torow,tocol);
-        Board tempboard = game->board;
+       
         execute_move(&tempboard,fromrow,fromcol,torow,tocol);
-        if(is_king_checked(&game->board,game)){
+        if(is_king_checked(&tempboard,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
             else {
