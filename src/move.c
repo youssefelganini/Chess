@@ -255,23 +255,6 @@ int enpasswn(Board *board, int from_row, int from_col,int to_row, int to_col){
     return 1;
 }
 /*----------------------------------------------KING CHECK------------------------------------------------*/
-
-void where_is_the_king(Board *board,Game *game,int from_row,int from_col,int to_row , int to_col){
-    int color= game->current_player;
-    int moved_pieced=board->square[from_row][from_col].type;
-    if(moved_pieced==KING){
-        if(color==WHITE){
-            board->wkingsq[0]=to_row;
-            board->wkingsq[1]=to_col;
-        }
-        else{
-            board->bkingsq[0]=to_row;
-            board->bkingsq[1]=to_col;
-        }
-    }
-}
-
-
 int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col){
     int attaker=board->square[from_row][from_col].type;
     switch (attaker)

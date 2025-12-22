@@ -148,9 +148,7 @@ void game_loop(Game *game){
         
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
         record_move(&move, fromrow, fromcol, torow, tocol, move.moved_piece, move.captured_piece);
-
-        where_is_the_king(&game->board,game,fromrow,fromcol,torow,tocol);
-
+        
         if (game->current_player == WHITE){
             game->current_player = BLACK;
         }
