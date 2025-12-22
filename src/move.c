@@ -620,20 +620,34 @@ void record_move(Move *move, Piece moved_piece, Piece captured_piece) {
 }
 void reverse_move(Board *board, int from_row, int from_col,
                  int to_row, int to_col, Piece moved_piece, Piece captured_piece) {
-                    printf("XY");
+    // Restore the moved piece to its original position
     board->square[from_row][from_col] = moved_piece;
+    // Restore the captured piece (or empty) to the destination
     board->square[to_row][to_col] = captured_piece;
-if(captured_piece.type != EMPTY) {
-        if (captured_piece.color == WHITE) {
-            board->whitecaptured[board->whitecapturedcount] = (Piece){EMPTY, EMPTY};
-            printf("Debug");
-            board->whitecapturedcount--;
-        } else {
-            board->blackcaptured[board->blackcapturedcount] = (Piece){EMPTY, EMPTY};
-            board->blackcapturedcount--;
-            printf("Debug");
+    
+    // Reset movement flags if undoing a king or rook move (to allow castling again if applicable)
+    if (moved_piece.type == KING) {
+        if (moved_piece.color == WHITE) {
+            board->whitekingmoved = 0;  // Reset flag
+        } else if (moved_piece.color == BLACK) {
+            board->blackkingmoved = 0;  // Reset flag
+        }
+    } else if (moved_piece.type == ROOK) {
+        if (moved_piece.color == WHITE) {
+            if (from_col == 0 && from_row == 7) {  // a-file rook
+                board->whiterook_amoved = 0;
+            } else if (from_col == 7 && from_row == 7) {  // h-file rook
+                board->whiterook_hmoved = 0;
+            }
+        } else if (moved_piece.color == BLACK) {
+            if (from_col == 0 && from_row == 0) {  // a-file rook
+                board->blackrook_amoved = 0;
+            } else if (from_col == 7 && from_row == 0) {  // h-file rook
+                board->blackrook_hmoved = 0;
+            }
         }
     }
+    // Note: Captured count decrement is now handled only in undo_move to avoid double decrementing
 }
 
 
