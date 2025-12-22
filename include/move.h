@@ -16,7 +16,7 @@ extern int input_as_int[4];  // global array
 void convert_input_to_int(char *x);
 int sign(int x);
 int rook(int from_row,int from_col,int to_row,int to_col);
-int king(int from_row,int from_col,int to_row,int to_col);
+int king(Board *board, Game *game, int from_row,int from_col,int to_row,int to_col);
 int bishop(int from_row,int from_col,int to_row,int to_col);
 int knight(int from_row,int from_col,int to_row,int to_col);
 int queen(int from_row,int from_col,int to_row,int to_col);
@@ -26,6 +26,7 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col);
 int castling(Board *board,char *castl,Game *game);
 int pawn_promotion(Board *board);
 int enpasswn(Board *board,int fromrow,int fromcol,int torow,int tocol);
+void where_is_the_king(Board *board,Game *game,int from_row,int from_col,int to_row , int to_col);
 int change_pawn(Board *board);
 int stalmate(Board *board,Game *game);
 int draw(Board *board,Game *game);

@@ -36,8 +36,22 @@ int rook(int from_row,int from_col,int to_row,int to_col){ /*input=[a,3,a,4]*/
     return 0;
 }
 
-int king(int from_row,int from_col,int to_row,int to_col){
-    return (abs(from_col-to_col)<=1 && abs(from_row-to_row)<=1);
+int king(Board *board, Game *game, int from_row,int from_col,int to_row,int to_col){
+int enrow;
+int encol;
+if(game->current_player==WHITE){
+    enrow=board->bkingsq[0];
+    encol=board->bkingsq[1];
+}
+else{
+    enrow=board->wkingsq[0];
+    encol=board->wkingsq[1];
+}
+if(abs(from_col-to_col)<=1 &&
+    abs(from_row-to_row)<=1 &&
+    (abs(to_row-enrow)>1||abs(to_col-encol)>1))
+    return 1;
+return 0;
 }
 
 int bishop(int from_row,int from_col,int to_row,int to_col){
@@ -242,6 +256,20 @@ int enpasswn(Board *board, int from_row, int from_col,int to_row, int to_col){
 }
 /*----------------------------------------------KING CHECK------------------------------------------------*/
 
+void where_is_the_king(Board *board,Game *game,int from_row,int from_col,int to_row , int to_col){
+    int color= game->current_player;
+    int moved_pieced=board->square[from_row][from_col].type;
+    if(moved_pieced==KING){
+        if(color==WHITE){
+            board->wkingsq[0]=to_row;
+            board->wkingsq[1]=to_col;
+        }
+        else{
+            board->bkingsq[0]=to_row;
+            board->bkingsq[1]=to_col;
+        }
+    }
+}
 
 
 int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col){
@@ -346,7 +374,7 @@ int no_king_can_move(Board *board,Move *move,Game *game){
             if (board->square[new_row][new_col].color == game->current_player) {
                 continue;
             }
-            if(king(board->wkingsq[0],board->wkingsq[1],new_row,new_col)==0) continue;
+            if(king(board, game, board->wkingsq[0],board->wkingsq[1],new_row,new_col)==0) continue;
             Board tempboard = *board;
             Move tempmove = *move;
             tempmove.from_row = row_king;
@@ -373,7 +401,7 @@ int no_king_can_move(Board *board,Move *move,Game *game){
             if (board->square[new_row][new_col].color == game->current_player) {
                 continue;
             }
-            if(king(board->bkingsq[0],board->bkingsq[1],new_row,new_col)==0) continue;
+            if(king(board, game, board->bkingsq[0],board->bkingsq[1],new_row,new_col)==0) continue;
             Board tempboard = *board;
             Move tempmove = *move;
             tempmove.from_row = row_king;
@@ -518,7 +546,7 @@ int validation(Board *board, Game *game,int from_row,int from_col,int to_row,int
         return knight(from_row,from_col,to_row,to_col);
     case 'K':
     case 'k':
-        return king(from_row,from_col,to_row,to_col);
+        return king(board, game, from_row,from_col,to_row,to_col);
     case 'P':
          if(from_row==6  && from_col==to_col ){
             if(to_row==4){
@@ -603,8 +631,12 @@ void execute_move(Board *board, int from_row, int from_col,
     if(moving_piece.type == KING) {
         if(moving_piece.color == WHITE) {
             board->whitekingmoved = 1;
+            board->wkingsq[0] = to_row;
+            board->wkingsq[1] = to_col;
         } else if(moving_piece.color == BLACK) {
             board->blackkingmoved = 1;
+            board->bkingsq[0] = to_row;
+            board->bkingsq[1] = to_col;
         }
     } else if(moving_piece.type == ROOK) {
         if(moving_piece.color == WHITE) {
