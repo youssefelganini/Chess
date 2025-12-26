@@ -1,9 +1,9 @@
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
+#include"game.h"
+#include"move.h"
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include"file_io.h"
 void tolowercase(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
@@ -103,8 +103,14 @@ void game_loop(Game *game){
             continue;
         }
 
-        if(strncmp(input,"redo",4)==0){
+        if(strncmp(input,"redo",4)==0 && move.undo_count>0){
             redo_move(&move,&game->board);
+            if(game->current_player == WHITE){
+                game->current_player = BLACK;
+            }
+            else{
+                game->current_player = WHITE;
+            }
             continue;
         }
 
@@ -147,15 +153,12 @@ void game_loop(Game *game){
             continue;
         }
 
-        move.from_row = fromrow;
-        move.from_col = fromcol;
-        move.to_row = torow;
-        move.to_col = tocol;
-        move.moved_piece = game->board.square[fromrow][fromcol];
-        move.captured_piece = game->board.square[torow][tocol];
+       
         
+        Piece moved_piece = game->board.square[fromrow][fromcol];
+        Piece captured_piece = game->board.square[torow][tocol];
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
-        record_move(&move, fromrow, fromcol, torow, tocol, move.moved_piece, move.captured_piece);
+        record_move(&move, fromrow, fromcol, torow, tocol, moved_piece, captured_piece);
         
         if (game->current_player == WHITE){
             game->current_player = BLACK;

@@ -1,4 +1,4 @@
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"board.h"
 #include<stdio.h>
 
 

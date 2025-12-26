@@ -3,14 +3,19 @@
 #include"board.h"
 #include"game.h"
 typedef struct {
+    int from_row, from_col, to_row, to_col;
+    Piece moved_piece, captured_piece;
+} MoveRecord;
+typedef struct {
+    MoveRecord history[100];
+    int move_count;
+    int undo_count;
     int from_row;
     int from_col;
     int to_row;
     int to_col;
     Piece moved_piece;
     Piece captured_piece;
-    Piece movehistory[100][2]; // [][0] for moved piece, [][1] for captured piece
-    int move_count;
 } Move;
 extern int input_as_int[4];  // global array
 void convert_input_to_int(char *x);
@@ -36,7 +41,7 @@ int no_king_king_move(Board *board,Move *move,Game *game);
 int chekmate(Board *board,Move *move,Game *game);
 int validation(Board *board, Game *game,int from_row,int from_col,int to_row,int to_col);
 void initialize_move_history(Move *move);
-void reverse_move(Board *board, Move *move);
+void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece);
 void record_move(Move *move, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece);
 void undo_move(Move *move, Board *board);
 void redo_move(Move *move, Board *board);
