@@ -4,7 +4,7 @@
 #include"game.h"
 typedef struct {
     int from_row, from_col, to_row, to_col;
-    Piece moved_piece, captured_piece;
+    Piece moved_piece, captured_piece ,promoted_piece;
 } MoveRecord;
 typedef struct {
     MoveRecord history[100];
@@ -31,7 +31,7 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col);
 int castling(Board *temboard,char *castl,Game *game,Board *board);
 int pawn_promotion(Board *board);
 int enpasswn(Board *board,int fromrow,int fromcol,int torow,int tocol);
-int change_pawn(Board *board);
+int change_pawn(Board *board,Move *move);
 int stalmate(Board *board,Game *game);
 int draw(Board *board,Game *game);
 int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col);

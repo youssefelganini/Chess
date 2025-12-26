@@ -206,14 +206,14 @@ int pawn_promotion(Board *board){
     }
     return 0;
 }
-int change_pawn(Board *board){
+int change_pawn(Board *board, Move *move){
     if(pawn_promotion(board)){
         char promotion;
         printf("Enter which piece you want\n");
         scanf(" %c",&promotion);
         switch(promotion){
             case 'Q':
-            case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN; break;
+            case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN;break;
             case 'R':
             case 'r': board->square[input_as_int[3]][input_as_int[2]].type=ROOK; break;
             case 'B':
@@ -224,6 +224,7 @@ int change_pawn(Board *board){
                 printf("Invalid input\n");
                 return 0;
         }
+        move->history[move->move_count - 1].promoted_piece = board->square[input_as_int[3]][input_as_int[2]];
         return 1;
     }
     return 0;
@@ -652,6 +653,8 @@ void execute_move(Board *board, int from_row, int from_col,
 void initialize_move_history(Move *move) {
     for (int i = 0; i < 100; i++) {
         move->history[i] = (MoveRecord){0};
+        move->history[i].promoted_piece.type = EMPTY;
+        move->history[i].promoted_piece.color = EMPTY;
     }
     move->move_count = 0;
     move->undo_count = 0;
@@ -739,9 +742,24 @@ void undo_move(Move *move, Board *board){
     if(rec->captured_piece.type != EMPTY) {
         if (rec->captured_piece.color == WHITE) {
             board->whitecapturedcount--;
+            board->whitecaptured[board->whitecapturedcount].type = EMPTY;
+            board->whitecaptured[board->whitecapturedcount].color = EMPTY;
         } else if (rec->captured_piece.color == BLACK) {
             board->blackcapturedcount--;
+            board->blackcaptured[board->blackcapturedcount].type = EMPTY;
+            board->blackcaptured[board->blackcapturedcount].color = EMPTY;
         }
+    }
+    if(enpasswn(board, rec->from_row, rec->from_col, rec->to_row, rec->to_col)==1){
+        if(rec->moved_piece.color==WHITE){
+            board->square[rec->to_row + 1][rec->to_col] = (Piece){PAWN, BLACK};
+        }
+        else if(rec->moved_piece.color==BLACK){
+            board->square[rec->to_row - 1][rec->to_col] = (Piece){PAWN, WHITE};
+        }
+    }
+    if(rec->promoted_piece.type != EMPTY) {
+        board->square[rec->from_row][rec->from_col] = rec->moved_piece;
     }
     move->undo_count++;
 }
@@ -754,4 +772,8 @@ void redo_move(Move *move, Board *board) {
     execute_move(board, rec->from_row, rec->from_col, rec->to_row, rec->to_col);
     move->move_count++;
     move->undo_count--;
+    
+    if(rec->promoted_piece.type != EMPTY) {
+        board->square[rec->to_row][rec->to_col] = rec->promoted_piece;
+    }
 }

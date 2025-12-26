@@ -40,7 +40,6 @@ void game_loop(Game *game){
     initialize_move_history(&move);
     while(game->state == ONGOING){
         
-        change_pawn(&game->board);
         print_game_state(game);
         
          Board tempboard = game->board;
@@ -159,6 +158,7 @@ void game_loop(Game *game){
         Piece captured_piece = game->board.square[torow][tocol];
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
         record_move(&move, fromrow, fromcol, torow, tocol, moved_piece, captured_piece);
+        change_pawn(&game->board,&move);
         
         if (game->current_player == WHITE){
             game->current_player = BLACK;
