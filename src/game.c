@@ -135,29 +135,27 @@ void game_loop(Game *game){
             continue;
         }
 
+
         
-        enpasswn(&game->board,fromrow,fromcol,torow,tocol);
-       
+        
         execute_move(&tempboard,fromrow,fromcol,torow,tocol);
         if(is_king_checked(&tempboard,game)){
             if(game->flag==1){
                 printf("YOUR KING IS STILL IN CHECK!\n");}
-            else {
-                printf("YOUR KING WILL BE IN CHECK!\n");
-                /*game->board.bkingsq[0]=game->board.ktempb[0];
-                game->board.bkingsq[1]=game->board.ktempb[1];
-                game->board.wkingsq[0]=game->board.ktempw[0];
-                game->board.wkingsq[0]=game->board.ktempw[1];*/
+                else {
+                    printf("YOUR KING WILL BE IN CHECK!\n");
+                    
+                }
+                continue;
             }
-            continue;
-        }
-
-       
-        
+            
+            
+            
         Piece moved_piece = game->board.square[fromrow][fromcol];
         Piece captured_piece = game->board.square[torow][tocol];
+        record_move(&move, fromrow, fromcol, torow, tocol, moved_piece, captured_piece, &game->board);
+        enpasswn(&game->board, &move, fromrow, fromcol, torow, tocol);
         execute_move(&game->board,fromrow,fromcol,torow,tocol);
-        record_move(&move, fromrow, fromcol, torow, tocol, moved_piece, captured_piece);
         change_pawn(&game->board,&move);
         
         if (game->current_player == WHITE){
