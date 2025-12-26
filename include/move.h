@@ -3,7 +3,7 @@
 #include"board.h"
 #include"game.h"
 typedef struct {
-    int from_row, from_col, to_row, to_col;
+    int from_row, from_col, to_row, to_col ,enpassant_row,enpassant_col;
     Piece moved_piece, captured_piece ,promoted_piece;
 } MoveRecord;
 typedef struct {
@@ -30,7 +30,7 @@ int dest_check(Board *board,int from_row,int from_col,int to_row,int to_col);
 int castling_path_clear(Board *board,int king_row,int king_col,int rook_col);
 int castling(/*Board *temboard*/char *castl,Game *game,Board *board);
 int pawn_promotion(Board *board);
-int enpasswn(Board *board,int fromrow,int fromcol,int torow,int tocol);
+int enpasswn(Board *board,Move *move,int fromrow,int fromcol,int torow,int tocol);
 int change_pawn(Board *board,Move *move);
 int stalmate(Board *board,Game *game);
 int draw(Board *board,Game *game);
@@ -40,9 +40,9 @@ int no_check_blocked_orCaptured(Board *board,Move *move,Game *game);
 int chekmate(Board *board,Move *move,Game *game);
 int validation(Board *board, Game *game,int from_row,int from_col,int to_row,int to_col);
 void initialize_move_history(Move *move);
-void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece);
-void record_move(Move *move, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece);
-void undo_move(Move *move, Board *board);
+void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece, Move *move);
+void record_move(Move *move, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece, Board *board);
+void undo_move(Move *move, Board *board); 
 void redo_move(Move *move, Board *board);
 void execute_move(Board *board,int from_row, int from_col,int to_row,int to_col);
 
