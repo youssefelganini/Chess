@@ -1,9 +1,10 @@
-#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include"file_io.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "/mnt/d/study/programming/Project/Chess/include/board.h"
-#include "/mnt/d/study/programming/Project/Chess/include/game.h"
-void save_game(Game *game, const char *filename) {
+#include "board.h"
+#include "game.h"
+#include "move.h"
+void save_game(Game *game, const char *filename , Move *move) {
     FILE *file = fopen(filename, "wb");
     if (file == NULL) {
         perror("Failed to open file for saving");
@@ -33,9 +34,27 @@ void save_game(Game *game, const char *filename) {
             game->board.whiterook_hmoved,
             game->board.blackrook_amoved,
             game->board.blackrook_hmoved);
+    fprintf(file, "%d %d\n", game->board.enpassen_row, game->board.enpassen_col);
+    fprintf(file, "%d %d\n", game->board.wkingsq[0], game->board.wkingsq[1]);
+    fprintf(file, "%d %d\n", game->board.bkingsq[0], game->board.bkingsq[1]);
+    fprintf(file, "%d\n", game->flag);
+    fprintf(file, "%d %d\n", move->move_count, move->undo_count);
+    for(int i = 0; i < move->move_count; i++) {
+        fprintf(file, "%d %d %d %d %d %d %d %d %d\n",
+                move->history[i].from_row,
+                move->history[i].from_col,
+                move->history[i].to_row,
+                move->history[i].to_col,
+                move->history[i].enpassant_row,
+                move->history[i].enpassant_col,
+                move->history[i].moved_piece.type,
+                move->history[i].moved_piece.color,
+                move->history[i].captured_piece.type);
+        fprintf(file, "%d %d\n", move->history[i].captured_piece.color, move->history[i].promoted_piece.type);
+    }
     fclose(file);
 }
-Game* load_game(const char *filename) {
+Game* load_game(const char *filename, Move *move) {
     FILE *file = fopen(filename, "rb");
     if (file == NULL) {
         perror("Failed to open file for loading");
@@ -106,6 +125,52 @@ Game* load_game(const char *filename) {
         free(game);
         fclose(file);
         return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.enpassen_row, &game->board.enpassen_col) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.wkingsq[0], &game->board.wkingsq[1]) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.bkingsq[0], &game->board.bkingsq[1]) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d\n", &game->flag) != 1) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &move->move_count, &move->undo_count) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    for(int i = 0; i < move->move_count; i++) {
+        if(fscanf(file, "%d %d %d %d %d %d %d %d %d\n",
+                &move->history[i].from_row,
+                &move->history[i].from_col,
+                &move->history[i].to_row,
+                &move->history[i].to_col,
+                &move->history[i].enpassant_row,
+                &move->history[i].enpassant_col,
+                &move->history[i].moved_piece.type,
+                &move->history[i].moved_piece.color,
+                &move->history[i].captured_piece.type) != 9) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
+        if(fscanf(file, "%d %d\n", &move->history[i].captured_piece.color, &move->history[i].promoted_piece.type) != 2) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
     }
     fclose(file);
     return game;

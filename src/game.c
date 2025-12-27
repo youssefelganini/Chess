@@ -31,6 +31,10 @@ void game_loop(Game *game){
     printf("Welcome to Chess!\n");
     printf("Commands:\n");
     printf("Enter moves in the format 'e2e4' to move a piece from e2 to e4.\n");
+    printf("To castle, enter 'e1g1' for white kingside, 'e1c1' for white queenside,\n");
+    printf("'e8g8' for black kingside, and 'e8c8' for black queenside.\n");
+    printf("Type 'undo' to undo the last move.\n");
+    printf("Type 'redo' to redo the last undone move.\n");
     printf("Type 'save <filename>' to save the current game.\n");
     printf("Type 'load <filename>' to load a saved game.\n");
     printf("Type 'exit' to quit the game.\n");
