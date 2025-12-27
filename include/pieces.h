@@ -1,9 +1,11 @@
+
+
 #ifndef PIECES_H
 #define PIECES_H
 
 #define KING 0
 #define QUEEN 1
-#define ROCK 2
+#define ROOK 2
 #define BISHOP 3
 #define KNIGHT 4
 #define PAWN 5

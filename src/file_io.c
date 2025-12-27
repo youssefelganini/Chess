@@ -1,0 +1,177 @@
+#include"/mnt/d/study/programming/Project/Chess/include/file_io.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "/mnt/d/study/programming/Project/Chess/include/board.h"
+#include "/mnt/d/study/programming/Project/Chess/include/game.h"
+#include "/mnt/d/study/programming/Project/Chess/include/move.h"
+void save_game(Game *game, const char *filename , Move *move) {
+    FILE *file = fopen(filename, "wb");
+    if (file == NULL) {
+        perror("Failed to open file for saving");
+        return;
+    }
+    fprintf(file, "%d\n", game->current_player);
+    fprintf(file, "%d\n", game->state);
+    for(int i = 0; i < bsize; i++) {
+        for(int j = 0; j < bsize; j++) {
+            fprintf(file, "%d %d ", game->board.square[i][j].type, game->board.square[i][j].color);
+        }
+        fprintf(file, "\n");
+    }
+    fprintf(file, "%d\n", game->board.whitecapturedcount);
+    for(int i = 0; i < game->board.whitecapturedcount; i++) {
+        fprintf(file, "%d %d ", game->board.whitecaptured[i].type, game->board.whitecaptured[i].color);
+    }
+    fprintf(file, "\n");
+    fprintf(file, "%d\n", game->board.blackcapturedcount);
+    for(int i = 0; i < game->board.blackcapturedcount; i++) {
+        fprintf(file, "%d %d ", game->board.blackcaptured[i].type, game->board.blackcaptured[i].color);
+    }
+    fprintf(file, "\n");
+    fprintf(file, "%d %d %d %d %d %d\n", game->board.whitekingmoved,
+            game->board.blackkingmoved,
+            game->board.whiterook_amoved,
+            game->board.whiterook_hmoved,
+            game->board.blackrook_amoved,
+            game->board.blackrook_hmoved);
+    fprintf(file, "%d %d\n", game->board.enpassen_row, game->board.enpassen_col);
+    fprintf(file, "%d %d\n", game->board.wkingsq[0], game->board.wkingsq[1]);
+    fprintf(file, "%d %d\n", game->board.bkingsq[0], game->board.bkingsq[1]);
+    fprintf(file, "%d\n", game->flag);
+    fprintf(file, "%d %d\n", move->move_count, move->undo_count);
+    for(int i = 0; i < move->move_count; i++) {
+        fprintf(file, "%d %d %d %d %d %d %d %d %d\n",
+                move->history[i].from_row,
+                move->history[i].from_col,
+                move->history[i].to_row,
+                move->history[i].to_col,
+                move->history[i].enpassant_row,
+                move->history[i].enpassant_col,
+                move->history[i].moved_piece.type,
+                move->history[i].moved_piece.color,
+                move->history[i].captured_piece.type);
+        fprintf(file, "%d %d\n", move->history[i].captured_piece.color, move->history[i].promoted_piece.type);
+    }
+    fclose(file);
+}
+Game* load_game(const char *filename, Move *move) {
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        perror("Failed to open file for loading");
+        return NULL;
+    }
+    int current_player, state;
+    if(fscanf(file, "%d\n", &current_player) != 1 ||
+       fscanf(file, "%d\n", &state) != 1) {
+        fclose(file);
+        return NULL;
+    }
+    Game *game = (Game *)malloc(sizeof(Game));
+    if (game == NULL) {
+        perror("Failed to allocate memory for game");
+        fclose(file);
+        return NULL;
+    }
+    game->current_player = current_player;
+    game->state = state;
+    for(int i = 0; i < bsize; i++) {
+        for(int j = 0; j < bsize; j++) {
+            if(fscanf(file, "%d %d ", &game->board.square[i][j].type, &game->board.square[i][j].color) != 2) {
+                free(game);
+                fclose(file);
+                return NULL;
+            }
+            game->board.square[i][j].type = game->board.square[i][j].type;
+            game->board.square[i][j].color = game->board.square[i][j].color;
+        }
+        fscanf(file, "\n");
+    }
+    if(fscanf(file, "%d\n", &game->board.whitecapturedcount) != 1) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    for(int i = 0; i < game->board.whitecapturedcount; i++) {
+        if(fscanf(file, "%d %d ", &game->board.whitecaptured[i].type, &game->board.whitecaptured[i].color) != 2) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
+        game->board.whitecaptured[i].type = game->board.whitecaptured[i].type;
+        game->board.whitecaptured[i].color = game->board.whitecaptured[i].color;
+    }
+    fscanf(file, "\n");
+    if(fscanf(file, "%d\n", &game->board.blackcapturedcount) != 1) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    for(int i = 0; i < game->board.blackcapturedcount; i++) {
+        if(fscanf(file, "%d %d ", &game->board.blackcaptured[i].type, &game->board.blackcaptured[i].color) != 2) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
+        game->board.blackcaptured[i].type = game->board.blackcaptured[i].type;
+        game->board.blackcaptured[i].color = game->board.blackcaptured[i].color;
+    }
+    fscanf(file, "\n");
+    if(fscanf(file, "%d %d %d %d %d %d\n", &game->board.whitekingmoved,
+            &game->board.blackkingmoved,
+            &game->board.whiterook_amoved,
+            &game->board.whiterook_hmoved,
+            &game->board.blackrook_amoved,
+            &game->board.blackrook_hmoved) != 6) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.enpassen_row, &game->board.enpassen_col) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.wkingsq[0], &game->board.wkingsq[1]) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &game->board.bkingsq[0], &game->board.bkingsq[1]) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d\n", &game->flag) != 1) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    if(fscanf(file, "%d %d\n", &move->move_count, &move->undo_count) != 2) {
+        free(game);
+        fclose(file);
+        return NULL;
+    }
+    for(int i = 0; i < move->move_count; i++) {
+        if(fscanf(file, "%d %d %d %d %d %d %d %d %d\n",
+                &move->history[i].from_row,
+                &move->history[i].from_col,
+                &move->history[i].to_row,
+                &move->history[i].to_col,
+                &move->history[i].enpassant_row,
+                &move->history[i].enpassant_col,
+                &move->history[i].moved_piece.type,
+                &move->history[i].moved_piece.color,
+                &move->history[i].captured_piece.type) != 9) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
+        if(fscanf(file, "%d %d\n", &move->history[i].captured_piece.color, &move->history[i].promoted_piece.type) != 2) {
+            free(game);
+            fclose(file);
+            return NULL;
+        }
+    }
+    fclose(file);
+    return game;
+}

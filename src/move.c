@@ -1,72 +1,73 @@
-#include "move.h"
+#include"/mnt/d/study/programming/Project/Chess/include/move.h"
 #include<math.h>
 #include<stdio.h>
-#include"board.h"
-#include <stdlib.h>
-
-int flag=0;
-int counter=0;
-
-
-/*we didnot write in validition if teh rook return 0 what it will print
-x is the input
-a  has the values of the input as int
-c array for castling
-checkoftheking
-checkmate
-*/
+#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include<stdlib.h>
+#include"/mnt/d/study/programming/Project/Chess/include/game.h"
 
 
 
-int input_as_int[4];  // global array
 
-void convert_input_to_int(char *x) {
-    input_as_int[0]=x[0] - 'a'; // start column
-    input_as_int[1]=x[1] - '1'; // start row
-    input_as_int[2]=x[2] - 'a'; // end column
-    input_as_int[3]=x[3] - '1'; // end row
+/*----------------------------------------------HELPER FN------------------------------------------------*/
+int input_as_int[4];
+void convert_input_to_int(char *x){
+    input_as_int[0] = x[0] - 'a';        // column a-h -> 0-7
+    input_as_int[1] = 8 - (x[1] - '0');  // rank 1-8 -> row 7-0
+    input_as_int[2] = x[2] - 'a';
+    input_as_int[3] = 8 - (x[3] - '0');
 }
-
-
 int sign(int x){ /*to know the piece go forward or backward*/
     if(x>0) return 1;
     if(x<0) return -1;
     return 0;
 }
-int rook(){ /*input=[a,3,a,4]*/
-    if(input_as_int[0]==input_as_int[2]&&input_as_int[1]!=input_as_int[3]) return 1;
-    if(input_as_int[0]!=input_as_int[2]&&input_as_int[1]==input_as_int[3]) return 1;
-    return 0;
-}
-int king(){
-    if(abs(input_as_int[0]-input_as_int[2])<=1 &&
-        abs(input_as_int[1]-input_as_int[3])<=1) return 1;
-
+/*----------------------------------------------MOVES LOGIC------------------------------------------------*/
+int rook(int from_row,int from_col,int to_row,int to_col){ /*input=[a,3,a,4]*/
+    if(from_col==to_col&&from_row!=to_row) return 1;
+    if(from_col!=to_col&&from_row==to_row) return 1;
     return 0;
 }
 
-int bishop(){
-    if(abs(input_as_int[2]-input_as_int[0])==abs(input_as_int[3]-input_as_int[1])) return 1;
+int king(Board *board, Game *game, int from_row,int from_col,int to_row,int to_col){
+int enrow;
+int encol;
+if(game->current_player==WHITE){
+    enrow=board->bkingsq[0];
+    encol=board->bkingsq[1];
+}
+else{
+    enrow=board->wkingsq[0];
+    encol=board->wkingsq[1];
+}
+ if(abs(from_col-to_col)<=1 &&
+     abs(from_row-to_row)<=1 &&
+     (abs(to_row-enrow)>1 || abs(to_col-encol)>1))
+    return 1;
+return 0;
+}
+
+int bishop(int from_row,int from_col,int to_row,int to_col){
+    if(abs(to_col-from_col)==abs(to_row-from_row)) return 1;
     return 0;
 }
 
 
-int knight(){
-if(((abs(input_as_int[0]-input_as_int[2])==2) && (abs(input_as_int[1]-input_as_int[3])==1)) || 
-   ((abs(input_as_int[0]-input_as_int[2])==1) && (abs(input_as_int[1]-input_as_int[3])==2))) return 1;
+int knight(int from_row,int from_col,int to_row,int to_col){
+if(((abs(from_col-to_col)==2) && (abs(from_row-to_row)==1)) || 
+   ((abs(from_col-to_col)==1) && (abs(from_row-to_row)==2))) return 1;
    return 0;
 }
-int queen(){
-    if(rook()||bishop()) return 1;
+int queen(int from_row,int from_col,int to_row,int to_col){
+    if(rook(from_row,from_col,to_row,to_col)||bishop(from_row,from_col,to_row,to_col)) return 1;
     return 0;
 }
-/*----------------------------------------------------------------------------------------------------------*/
-int path_check(Board *board){
-    int dx=sign(input_as_int[2]-input_as_int[0]);
-    int dy=sign(input_as_int[3]-input_as_int[1]);
-    int x=dx+input_as_int[0];
-    int y=dy+input_as_int[1];
-    while (x!=input_as_int[2]||y!=input_as_int[3])
+/*----------------------------------------------PATH------------------------------------------------*/
+int path_check(Board *board,int from_row,int from_col,int to_row,int to_col){
+    int dx=sign(to_col-from_col);
+    int dy=sign(to_row-from_row);
+    int x=dx+from_col;
+    int y=dy+from_row;
+    while (x!=to_col||y!=to_row)
     {
         if(board->square[y][x].type!= EMPTY) return 0;
         x+=dx;
@@ -74,11 +75,11 @@ int path_check(Board *board){
     }
     return 1;
 }
-int dest_check(Board*b){
-    if(board->square[input_as_int[3]][input_as_int[2]].type==board->square[input_as_int[1]][input_as_int[0]].type ) return 0;
+int dest_check(Board *board,int from_row,int from_col,int to_row,int to_col){
+    if(board->square[to_row][to_col].color==board->square[from_row][from_col].color ) return 0;
     return 1;
 }
-/*----------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------CASTLING------------------------------------------------*/
 int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
     int dx;
     if((rook_col-king_col)>0){ 
@@ -93,262 +94,694 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
         }
         x += dx;
     }
-    return 1;
+    return 1; 
 }
-int castling(Board *board, char *castl){  /*when callilng fn we will put a condetion if castl[0]=='c' 
-                                        still i want to ckeack the king square is chacked or not befor castling*/
-    if(is_king_checked(board)!=1){
-        if(/*white is playing*/){
-            if(castl[1]=='R'||castl[1]=='r'){
-                if(board->square[7][4].type==KING && board->square[7][7].type==ROCK){
-                    if(!castling_path_clear(board, 7, 4, 7)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[7][6]=K && square[7][5]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }
-
-            }
-            else if(castl[1]=='l'||castl[1]=='L'){
-                if(board->square[7][4].type==KING && board->square[7][0].type==ROCK){
-                    if(!castling_path_clear(b, 7, 4, 0)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[7][2]=K && square[7][3]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }                    
-
-            }
-            else{
-                printf("Invalid input\n");
-                return 0;
-            }
-
-        }
-        else if(/*Black is playing*/){
-            if(castl[1]=='R'||castl[1]=='r'){
-                if(board->square[0][4].type==KING && board->square[0][7].type==ROCK){
-                    if(!castling_path_clear(board, 0, 4, 7)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                    /* square[0][6]=K && square[0][5]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }
-
-            }
-            else if(castl[1]=='l'||castl[1]=='L'){
-                if(board->square[0][4].type==KING && board->square[0][0].type==ROCK){
-                    if(!castling_path_clear(board, 0, 4, 0)){
-                        printf("Cannot castle, path blocked\n");
-                        return 0;
-                    }
-                         /*square[0][2]=K && square[0][3]=R */
-                }
-                else {
-                    printf("You canot castle and you moved king or rook\n");
-                    return 0;
-                }                    
-
-            }
-            else{
-                printf("Invalid input\n");
-                return 0;
-            }
-
-        }
-
-    }
-    else{
-        printf("You cannot castle and your king is checked\n");
+int castling(char *castl,Game *game,Board *board, Move *move) {
+    convert_input_to_int(castl);
+    if(board->square[input_as_int[1]][input_as_int[0]].type!=KING) return 0;
+    if(abs(input_as_int[2]-input_as_int[0])!=2) return 0;
+    Board tempbaord=*board;
+    execute_move(&tempbaord,input_as_int[1],input_as_int[0],input_as_int[3],input_as_int[2]);
+    if(is_king_checked(board,game)) {
+        printf("\nYOU CANNOT CASTLE WHILE YOUR KING IN CHECK!\n");
         return 0;
+    } 
+    if(is_king_checked(&tempbaord,game)){
+    printf("\nYOU CANNOT CASTLING YOUR KING WILL BE CHECEKD\n");
+    return 0;
     }
+
+    if(game->current_player==WHITE){
+        if(input_as_int[2]==6&&input_as_int[3]==7){
+            if(board->whitekingmoved==1||board->whiterook_hmoved==1||board->whiterook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
+                return 0;
+            }
+            if(board->square[7][4].type!=KING||board->square[7][7].type!=ROOK) return 0;
+            if(!castling_path_clear(board,7,4,7)){
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
+                return 0;
+            }
+            record_move(move,7,4,7,6,board->square[7][4],board->square[7][6],board);
+            execute_move(board,7,4,7,6);
+            execute_move(board,7,7,7,5);
+            return 1;
+        } else if(input_as_int[2]==2&&input_as_int[3]==7){
+            if(board->whitekingmoved==1||board->whiterook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
+                return 0;
+            }
+            if(board->square[7][4].type!=KING||board->square[7][0].type!=ROOK) return 0;
+            if(!castling_path_clear(board,7,4,0)){
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
+                return 0;
+            }
+            record_move(move,7,4,7,2,board->square[7][4],board->square[7][2],board);
+            execute_move(board,7,4,7,2);
+            execute_move(board,7,0,7,3);
+            return 1;
+        } else {
+            return 0;
+        }
+    } else if(game->current_player==BLACK){
+        if(input_as_int[2]==6&&input_as_int[3]==0){
+            if(board->blackkingmoved==1||board->blackrook_hmoved==1||board->blackrook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
+                return 0;
+            }
+            if(board->square[0][4].type!=KING||board->square[0][7].type!=ROOK) return 0;
+            if(!castling_path_clear(board,0,4,7)){
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
+                return 0;
+            }
+            record_move(move,0,4,0,6,board->square[0][4],board->square[0][6],board);
+            execute_move(board,0,4,0,6);
+            execute_move(board,0,7,0,5);
+            return 1;
+        } else if(input_as_int[2]==2&&input_as_int[3]==0){
+            if(board->blackkingmoved==1||board->blackrook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
+                return 0;
+            }
+            if(board->square[0][4].type!=KING||board->square[0][0].type!=ROOK) return 0;
+            if(!castling_path_clear(board,0,4,0)){
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
+                return 0;
+            }
+            record_move(move,0,4,0,2,board->square[0][4],board->square[0][2],board);
+            execute_move(board,0,4,0,2);
+            execute_move(board,0,0,0,3);
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    return 0;
 }
-/*----------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------PROMATION------------------------------------------------*/
 int pawn_promotion(Board *board){
-    if(board->squares[0][input_as_int[2]].type==PAWN &&
-       board->squares[0][input_as_int[2]].color==WHITE){
+    if(board->square[input_as_int[3]][input_as_int[2]].type==PAWN &&
+       board->square[input_as_int[3]][input_as_int[2]].color==WHITE&&input_as_int[3]==0){
         return 1;
     }
-    if(board->squares[7][input_as_int[2]].type==PAWN &&
-       board->squares[7][input_as_int[2]].color==BLACK){
+    if(board->square[input_as_int[3]][input_as_int[2]].type==PAWN &&
+       board->square[input_as_int[3]][input_as_int[2]].color==BLACK&&input_as_int[3]==7){
         return 1;
     }
     return 0;
 }
-int change_pawn(Board *board){
+int change_pawn(Board *board, Move *move){
     if(pawn_promotion(board)){
         char promotion;
-        printf("Enter which piece you want\n");
+        printf("Enter which piece you want (<Q/q>, <R/r>, <B/b>, <N/n>)\n");
         scanf(" %c",&promotion);
+         while(promotion!='Q'&&promotion!='q'&&promotion!='R'&&promotion!='r'&&promotion!='B'&&promotion!='b'&&promotion!='N'&&promotion!='n'){
+             printf("\nINVALID INPUT ENTER AGAIN\n");
+             scanf(" %c ",&promotion);
+         }
         switch(promotion){
             case 'Q':
-            case 'q': board->squares[input_as_int[3]][input_as_int[2]].type=QUEEN; break;
+            case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN;break;
             case 'R':
-            case 'r': board->squares[input_as_int[3]][input_as_int[2]].type=ROCK; break;
+            case 'r': board->square[input_as_int[3]][input_as_int[2]].type=ROOK; break;
             case 'B':
-            case 'b': board->squares[input_as_int[3]][input_as_int[2]].type=BISHOP; break;
+            case 'b': board->square[input_as_int[3]][input_as_int[2]].type=BISHOP; break;
             case 'N':
-            case 'n': board->squares[input_as_int[3]][input_as_int[2]].type=KNIGHT; break;
+            case 'n': board->square[input_as_int[3]][input_as_int[2]].type=KNIGHT; break;
             default: 
                 printf("Invalid input\n");
                 return 0;
         }
+        move->history[move->move_count - 1].promoted_piece = board->square[input_as_int[3]][input_as_int[2]];
         return 1;
     }
     return 0;
 }
-/*----------------------------------------------------------------------------------------------------------*/
-int is_king_checked(Board*board){
-    
-}
-/*----------------------------------------------------------------------------------------------------------*/
-int validation(char *x,Board *board){
-    convert_input_to_int(x);
-    if(dest_check(board)==0){
-        printf("You cannot capture your own piece\n");
-        return 0;
+/*----------------------------------------------En passant------------------------------------------------*/
+int enpasswn(Board *board, Move *move, int from_row, int from_col,int to_row, int to_col){
+    Piece moving_piece = board->square[from_row][from_col];
+    if(moving_piece.type == PAWN && to_row == board->enpassen_row && to_col == board->enpassen_col){
+        if(moving_piece.color == WHITE) {
+            board->blackcaptured[board->blackcapturedcount++] = board->square[board->enpassen_row + 1][board->enpassen_col];
+            move->history[move->move_count - 1].captured_piece = board->square[board->enpassen_row + 1][board->enpassen_col];
+            board->square[board->enpassen_row + 1][board->enpassen_col].type = EMPTY;
+            board->square[board->enpassen_row + 1][board->enpassen_col].color = EMPTY;
+            move->history[move->move_count - 1].is_en_passant = 1;
+        } else if(moving_piece.color == BLACK) {
+            board->whitecaptured[board->whitecapturedcount++] = board->square[board->enpassen_row - 1][board->enpassen_col];
+            move->history[move->move_count - 1].captured_piece = board->square[board->enpassen_row - 1][board->enpassen_col];
+            board->square[board->enpassen_row - 1][board->enpassen_col].type = EMPTY;
+            board->square[board->enpassen_row - 1][board->enpassen_col].color = EMPTY;
+            move->history[move->move_count - 1].is_en_passant = 1;
+        }
     }
-    char piece=(board->square[input_as_int[1]][input_as_int[0]]); /*current piece*/
-    if(x[0]==x[2]&&x[1]==x[3]) {
-        printf("Invlaid input ,you didnot move the piece\n");
+
+    int des=input_as_int[3]-input_as_int[1];
+    int dx=sign(des);
+    if(board->square[input_as_int[1]][input_as_int[0]].type!=PAWN) {
+        board->enpassen_row=-1;
+        board->enpassen_col=-1;
         return 0;}
-    if(x[0]<'a' || x[0]>'h' || x[2]<'a' || x[2]>'h' || 
-            x[1]<'1' || x[1]>'8' || x[3]<'1' || x[3]>'8') {
-        printf("Invalid input, must be in the range of (a-h) and (1-8)\n");
-        return 0;
-    }
-    switch (piece)
+    if(abs(des)!=2) {
+        board->enpassen_row=-1;
+        board->enpassen_col=-1;
+        return 0;}
+    board->enpassen_row=input_as_int[1]+dx;
+    board->enpassen_col=input_as_int[0];
+    return 1;
+}
+/*----------------------------------------------KING CHECK------------------------------------------------*/
+int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col){
+    int attaker=board->square[from_row][from_col].type;
+    switch (attaker)
     {
-    case 'r':
-    case 'R':
-        if(path_check(board)==0){
-           printf("Path is blocked\n");
-            return 0;
-        }
-        return rook();
-    case 'b':
-    case 'B':
-        if(path_check(board)==0){
-            printf("Path is blocked\n");
-            return 0;
-        }
-        return bishop();
-    case 'Q':
-    case 'q':
-        if(path_check(board)==0){
-            printf("Path is blocked\n");
-            return 0;
-        }
-        return queen();
-    case 'K':
-    case 'k':
-        return king();
-    case 'N':
-    case 'n':
-        return knight();
-    case 'P':
-        if(x[1]=='2'  && x[0]==x[2] ){
-            if(x[3]=='4'){
-                if(path_check(board)==0){
-                    printf("Path is blocked\n");
-                    return 0;
-                }
-                if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
-                    printf("Canot move here the square is not empty\n");
-                    return 0;
-                }
-                
-            return 1;                
+    case ROOK:
+        if(rook(from_row,from_col,to_row,to_col)){
+            if(path_check(board,from_row,from_col,to_row,to_col)){
+                return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]+1 &&input_as_int[0]==input_as_int[2]) {
-            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
-                printf("Canot move here the square is not empty\n");
+        return 0;
+    case BISHOP:
+        if(bishop(from_row,from_col,to_row,to_col)){
+            if(path_check(board,from_row,from_col,to_row,to_col)){
+                return 1;
+            }
+        }
+        return 0;
+    case KNIGHT:
+        if(knight(from_row,from_col,to_row,to_col)) return 1;
+        return 0;
+    case QUEEN:
+        if(queen(from_row,from_col,to_row,to_col)){
+            if(path_check(board,from_row,from_col,to_row,to_col)){
+                return 1;
+            }
+        }
+        return 0;
+    case PAWN:
+        if(board->square[from_row][from_col].color==BLACK){
+            if(from_row+1==to_row&&( from_col==to_col+1||from_col==to_col-1)){
+                return 1;
+            }
+        }
+        if(board->square[from_row][from_col].color==WHITE){
+            if(from_row-1==to_row&&(from_col==to_col+1||from_col==to_col-1)){
+                return 1;
+            }
+        }
+        return 0;
+        
+    default:
+        return 0;
+    }
+
+}
+
+int is_king_checked(Board *board,Game *game){    
+    int white_king_row = -1, white_king_col = -1;
+    int black_king_row = -1, black_king_col = -1;
+    for(int i=0; i<8; i++){
+        for(int j=0; j<8; j++){
+            if(board->square[i][j].type == KING){
+                if(board->square[i][j].color == WHITE){
+                    white_king_row = i;
+                    white_king_col = j;
+                }
+                if(board->square[i][j].color == BLACK){
+                    black_king_row = i;
+                    black_king_col = j;
+                }
+            }
+        }
+    }
+    board->wkingsq[0]=white_king_row;
+    board->wkingsq[1]=white_king_col;
+    board->bkingsq[0]=black_king_row;
+    board->bkingsq[1]=black_king_col;
+
+    if(game->current_player==WHITE){
+        for(int i=0; i<8;i++){
+            for(int j=0;j<8;j++){
+                if(board->square[i][j].color==BLACK){
+                    if(can_attack(board,i,j,white_king_row,white_king_col))return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    if(game->current_player==BLACK){
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                if(board->square[i][j].color==WHITE){
+                    if(can_attack(board,i,j,black_king_row,black_king_col)) return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    return 0;    
+}
+/*----------------------------------------------CHECKMATE------------------------------------------------*/
+int no_check_blocked_orCaptured(Board *board, Move *move, Game *game){
+    if(is_king_checked(board,game)==0) return 0;
+    Board temp= *board;
+    Move tempmove = *move;
+
+    int color=game->current_player;
+    for(int from_row=0;from_row<8;from_row++){
+        for(int from_col=0;from_col<8;from_col++){
+            if(board->square[from_row][from_col].color!=color) continue;
+            
+            for(int to_row=0;to_row<8;to_row++){
+                for(int to_col=0;to_col<8;to_col++){
+                    if(validation(board,game,from_row,from_col,to_row,to_col)==0) continue;
+                    tempmove.from_row = from_row;
+                    tempmove.from_col = from_col;
+                    tempmove.to_row = to_row;
+                    tempmove.to_col = to_col;
+                    tempmove.moved_piece = board->square[from_row][from_col];
+                    tempmove.captured_piece = board->square[to_row][to_col];
+                    execute_move(&temp,from_row,from_col,to_row,to_col);
+                    if(is_king_checked(&temp,game)==0) return 0;
+                    reverse_move(&temp, tempmove.from_row, tempmove.from_col, tempmove.to_row, tempmove.to_col, tempmove.moved_piece, tempmove.captured_piece ,move);
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+int chekmate(Board *board,Move *move,Game *game){
+    if(is_king_checked(board,game)==0) return 0;
+    if(no_check_blocked_orCaptured(board,move,game)) return 1;
+    return 0;
+}
+/*----------------------------------------------STALMATE&DRAW------------------------------------------------*/
+int stalmate(Board *board,Game *game){
+    if(is_king_checked(board,game)) return 0; 
+    int color=game->current_player;
+    for(int from_row=0;from_row<8;from_row++){
+        for(int from_col=0;from_col<8;from_col++){
+            if(board->square[from_row][from_col].color!=color) continue;
+            for(int to_row=0;to_row<8;to_row++){
+                for(int to_col=0;to_col<8;to_col++){
+                    if(validation(board,game,from_row,from_col,to_row,to_col)){
+                        Board temp = *board;
+                        execute_move(&temp,from_row,from_col,to_row,to_col);
+                        if(is_king_checked(&temp,game)==0) return 0;
+                    }
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+int draw(Board *board,Game *game){
+    /*something for bishop later*/
+    if((is_king_checked(board,game)==1)) return 0;
+    int knighes[2]={0};
+    int bishop[2]={0};
+    for(int from_row=0;from_row<8;from_row++){
+        for(int from_col=0;from_col<8;from_col++){
+            int type = board->square[from_row][from_col].type;
+            if(type==QUEEN||type==ROOK||type==PAWN) return 0;
+            if(type==KNIGHT &&board->square[from_row][from_col].color==WHITE) knighes[0]++;
+            if(type==KNIGHT &&board->square[from_row][from_col].color==BLACK) knighes[1]++;
+            if(type==BISHOP &&board->square[from_row][from_col].color==WHITE) bishop[0]++;
+            if(type==BISHOP &&board->square[from_row][from_col].color==BLACK) bishop[1]++;
+            if(knighes[0]+bishop[0]>1||knighes[1]+bishop[1]>1) return 0;
+        }
+    }
+    return 1;
+}
+
+
+
+/*----------------------------------------------VALIDATION------------------------------------------------*/
+int validation(Board *board, Game *game,int from_row,int from_col,int to_row,int to_col){
+    if(from_row<0 || from_row>7 || to_row<0 || to_row>7 || 
+            from_row<0 || from_col>7 || to_col<0 || to_col>7) {
+        return 0;
+    }
+    if(game->current_player==WHITE){
+        if(board->square[from_row][from_col].color==BLACK){
+            return 0;
+        }
+    }
+    else if(game->current_player==BLACK){
+        if(board->square[from_row][from_col].color==WHITE){
+            return 0;
+        }
+    }
+    if(board->square[from_row][from_col].type == EMPTY){
+        return 0;
+    }
+    if(dest_check(board,from_row,from_col,to_row,to_col)==0){;
+        return 0;
+    }
+
+
+    char piece=piece_char(board->square[from_row][from_col]); /*current piece*/
+    if(from_col==to_col&&from_row==to_row) {
+        return 0;}
+    switch (piece)
+    {
+    case 'R':
+    case 'r':
+        if(path_check(board,from_row,from_col,to_row,to_col)==0){
+            return 0;
+        }
+        return rook(from_row,from_col,to_row,to_col);
+    case 'b':
+    case 'B':
+        if(path_check(board,from_row,from_col,to_row,to_col)==0){
+            return 0;
+        }
+        return bishop(from_row,from_col,to_row,to_col);
+    case 'q':
+    case 'Q':
+        if(path_check(board,from_row,from_col,to_row,to_col)==0){
+            return 0;
+        }
+        return queen(from_row,from_col,to_row,to_col);
+    case 'N':
+    case 'n':
+        return knight(from_row,from_col,to_row,to_col);
+    case 'K':
+    case 'k':
+        return king(board, game, from_row,from_col,to_row,to_col);
+    case 'P':
+         if(from_row==6  && from_col==to_col ){
+            if(to_row==4){
+                 if(path_check(board,from_row,from_col,to_row,to_col)==0){
+                    return 0;
+                }
+                if(board->square[to_row][to_col].type!= EMPTY) {
+                    return 0;
+                }     
+            return 1;              
+            }
+        }
+        if(to_row==from_row-1 &&from_col==to_col) {
+           if(board->square[to_row][to_col].type!= EMPTY) {
                 return 0;
             }/*check for pawn if there is piece a black piece or white where it goes*/
             else{
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]+1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(board->square[input_as_int[3]][input_as_int[2]].type!=BLACK){
-                printf("This move is invalid\n");
+        if(from_row==3&&board->enpassen_col==to_col&&board->enpassen_row==to_row) return 1;
+        if(to_row==from_row-1 &&(to_col==from_col+1||to_col==from_col-1)){
+            if(board->square[to_row][to_col].color!=BLACK){
                 return 0;
             }
             return 1;
-
         }
-        printf("The pawn canot move like that");
         return 0;
-
-        
     case 'p':
-        if(x[1]=='7' && x[2]==x[0]){
-            if(x[3]=='5'){
-                if(path_check(b)==0){
-                    printf("Path is blocked\n");  
+        if(from_row==1 && from_col==to_col){
+            if(to_row==3){
+                if(path_check(board,from_row,from_col,to_row,to_col)==0){ 
                     return 0;
                 }
-                if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
-                    printf("Canot move here the square not empty\n");
+                if(board->square[to_row][to_col].type!= EMPTY) {
                     return 0;
                 }
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]-1 &&input_as_int[0]==input_as_int[2]) {
-            if(board->square[input_as_int[3]][input_as_int[2]].type!= EMPTY) {
-                printf("Canot move here the square is not empty\n");
+        if(to_row==from_row+1 &&from_col==to_col) {
+            if(board->square[to_row][to_col].type!= EMPTY) {
                 return 0;
             }/*check for pawn if there is  a black piece or white where it goes*/
             else{
                 return 1;
             }
         }
-        if(input_as_int[3]==input_as_int[1]-1 &&(input_as_int[2]==input_as_int[0]+1||input_as_int[2]==input_as_int[0]-1)){
-            if(board->square[input_as_int[3]][input_as_int[2]].type!=WHITE){
-                printf("This move is invalid\n");
+        if(from_row==4&&board->enpassen_col==to_col&&board->enpassen_row==to_row) return 1;
+        if(to_row==from_row+1 &&(to_col==from_col+1||to_col==from_col-1)){
+            if(board->square[to_row][to_col].color!=WHITE ){
                 return 0;
             }
             return 1;
         }
-        printf("The pawn canot move like that");
         return 0;
         
-    
     default:
-        printf("Invalid input,This square has no pieces\n");
         return 0;
     }
 
 }
-/*----------------------------------------------------------------------------------------------------------*/
+/*----------------------------------------------MOVE EXECUTE------------------------------------------------*/
 void execute_move(Board *board, int from_row, int from_col,
                  int to_row, int to_col) {
-    Piece moving_piece = board->squares[from_row][from_col];
-    Piece captured_piece = board->squares[to_row][to_col];
+    Piece moving_piece = board->square[from_row][from_col];
+    Piece captured_piece = board->square[to_row][to_col];
+    
     
  
     if (captured_piece.type != EMPTY) {
-        if (captured_piece.color == WHITE) {
-            board->black_captured[board->black_captured_count++] = captured_piece;
+        if (captured_piece.color == BLACK) {
+            board->blackcaptured[board->blackcapturedcount++] = captured_piece;
         } else {
-            board->white_captured[board->white_captured_count++] = captured_piece;
+            board->whitecaptured[board->whitecapturedcount++] = captured_piece;
         }
     }
     
-    board->squares[to_row][to_col] = moving_piece;
-    board->squares[from_row][from_col].type = EMPTY;
-    board->squares[from_row][from_col].color = NONE;}
+    board->square[to_row][to_col] = moving_piece;
+    board->square[from_row][from_col].type = EMPTY;
+    board->square[from_row][from_col].color = EMPTY;
+
+    if(moving_piece.type == KING) {
+        if(moving_piece.color == WHITE) {
+            board->whitekingmoved = 1;
+            board->wkingsq[0] = to_row;
+            board->wkingsq[1] = to_col;
+        } else if(moving_piece.color == BLACK) {
+            board->blackkingmoved = 1;
+            board->bkingsq[0] = to_row;
+            board->bkingsq[1] = to_col;
+        }
+    } else if(moving_piece.type == ROOK) {
+        if(moving_piece.color == WHITE) {
+            if(from_col == 0 && from_row == 7) {
+                board->whiterook_amoved = 1;
+            } else if(from_col == 7 && from_row == 7) {
+                board->whiterook_hmoved = 1;
+            }
+        } else {
+            if(from_col == 0 && from_row == 0) {
+                board->blackrook_amoved = 1;
+            } else if(from_col == 7 && from_row == 0) {
+                board->blackrook_hmoved = 1;
+            }
+        }
+    }
+}
+
+
+
+/*----------------------------------------------SAVE/REDO/UNDO/LOAD------------------------------------------------*/
+
+void initialize_move_history(Move *move) {
+    for (int i = 0; i < 100; i++) {
+        move->history[i] = (MoveRecord){0};
+        move->history[i].promoted_piece.type = EMPTY;
+        move->history[i].promoted_piece.color = EMPTY;
+    }
+    move->move_count = 0;
+    move->undo_count = 0;
+}
+void record_move(Move *move, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece , Board *board) {
+    move->from_row = from_row;
+    move->from_col = from_col;
+    move->to_row = to_row;
+    move->to_col = to_col;
+    move->moved_piece = moved_piece;
+    move->captured_piece = captured_piece;
+    
+    MoveRecord *rec = &move->history[move->move_count];
+    rec->from_row = from_row;
+    rec->from_col = from_col;
+    rec->to_row = to_row;
+    rec->to_col = to_col;
+    rec->moved_piece = moved_piece;
+    rec->captured_piece = captured_piece;
+    rec->promoted_piece.type = EMPTY;
+    rec->promoted_piece.color = EMPTY;
+    rec->is_en_passant = 0;
+    if(board->enpassen_row != -1 && board->enpassen_col != -1) {
+        rec->enpassant_row = board->enpassen_row;
+        rec->enpassant_col = board->enpassen_col;
+    } else {
+        rec->enpassant_row = -1;
+        rec->enpassant_col = -1;
+    }
+    
+    rec->white_king_moved = board->whitekingmoved;
+    rec->black_king_moved = board->blackkingmoved;
+    rec->white_rook_a_moved = board->whiterook_amoved;
+    rec->white_rook_h_moved = board->whiterook_hmoved;
+    rec->black_rook_a_moved = board->blackrook_amoved;
+    rec->black_rook_h_moved = board->blackrook_hmoved;
+    
+    move->move_count++;
+    move->undo_count = 0;
+}
+void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece ,Move *move) {
+    board->square[from_row][from_col] = moved_piece;  
+    if(move->history[move->move_count].is_en_passant) {
+        if(moved_piece.color == WHITE) {
+            board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col] = captured_piece;
+            board->square[to_row][to_col].type = EMPTY;
+            board->square[to_row][to_col].color = EMPTY;
+        } else if(moved_piece.color == BLACK) {
+            board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col] = captured_piece;
+            board->square[to_row][to_col].type = EMPTY;
+            board->square[to_row][to_col].color = EMPTY;
+        }
+    } else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == WHITE && from_col == 4 && from_row == 7 && to_col == 6 && to_row == 7) {
+        board->square[7][7] = board->square[7][5];
+        board->square[7][5].type = EMPTY;
+        board->square[7][5].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == WHITE && from_col == 2 && from_row == 7 && to_col == 4 && to_row == 7) {
+        board->square[7][0] = board->square[7][3];
+        board->square[7][3].type = EMPTY;
+        board->square[7][3].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == BLACK && from_col == 4 && from_row == 0 && to_col == 6 && to_row == 0) {
+        board->square[0][7] = board->square[0][5];
+        board->square[0][5].type = EMPTY;
+        board->square[0][5].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == BLACK && from_col == 4 && from_row == 0 && to_col == 2 && to_row == 0) {
+        board->square[0][0] = board->square[0][3];
+        board->square[0][3].type = EMPTY;
+        board->square[0][3].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if(move->history[move->move_count].promoted_piece.type != EMPTY) {
+        board->square[from_row][from_col].type = PAWN;
+        board->square[to_row][to_col] = captured_piece;
+    }
+     else {
+        board->square[to_row][to_col] = captured_piece;
+    }
+    if (moved_piece.type == KING) {
+        if (moved_piece.color == WHITE) {
+            board->whitekingmoved = 0;  // Reset flag
+        } else if (moved_piece.color == BLACK) {
+            board->blackkingmoved = 0;  // Reset flag
+        }
+    } else if (moved_piece.type == ROOK) {
+        if (moved_piece.color == WHITE) {
+            if (from_col == 0 && from_row == 7) {  // a-file rook
+                board->whiterook_amoved = 0;
+            } else if (from_col == 7 && from_row == 7) {  // h-file rook
+                board->whiterook_hmoved = 0;
+            }
+        } else if (moved_piece.color == BLACK) {
+            if (from_col == 0 && from_row == 0) {  // a-file rook
+                board->blackrook_amoved = 0;
+            } else if (from_col == 7 && from_row == 0) {  // h-file rook
+                board->blackrook_hmoved = 0;
+            }
+        }
+    }
+    //king square update
+    if(moved_piece.type == KING) {
+        if(moved_piece.color == WHITE) {
+            board->wkingsq[0] = from_row;
+            board->wkingsq[1] = from_col;
+        } else if(moved_piece.color == BLACK) {
+            board->bkingsq[0] = from_row;
+            board->bkingsq[1] = from_col;
+        }
+    }
+    
+}
+void undo_move(Move *move, Board *board){
+    if (move->move_count == 0) {
+        printf("No moves to undo.\n");
+        return;
+    }
+    move->move_count--;
+    MoveRecord *rec = &move->history[move->move_count];
+    reverse_move(board, rec->from_row, rec->from_col, rec->to_row, rec->to_col, rec->moved_piece, rec->captured_piece, move);
+    if(rec->captured_piece.type != EMPTY) {
+        if (rec->captured_piece.color == WHITE) {
+            board->whitecapturedcount--;
+            board->whitecaptured[board->whitecapturedcount].type = EMPTY;
+            board->whitecaptured[board->whitecapturedcount].color = EMPTY;
+        } else if (rec->captured_piece.color == BLACK) {
+            board->blackcapturedcount--;
+            board->blackcaptured[board->blackcapturedcount].type = EMPTY;
+            board->blackcaptured[board->blackcapturedcount].color = EMPTY;
+        }
+    }
+    if(rec->is_en_passant && rec->captured_piece.type != EMPTY) {
+        if(rec->captured_piece.color == WHITE) {
+            if(board->whitecapturedcount > 0) {
+                board->whitecapturedcount--;
+            }
+        } else if(rec->captured_piece.color == BLACK) {
+            if(board->blackcapturedcount > 0) {
+                board->blackcapturedcount--;
+            }
+        }
+    }
+    
+    if(rec->promoted_piece.type != EMPTY) {
+        board->square[rec->from_row][rec->from_col] = rec->moved_piece;
+    }
+    move->undo_count++;
+}
+void redo_move(Move *move, Board *board) {
+    if (move->move_count >= 100 || move->undo_count == 0) {
+        printf("No moves to redo.\n");
+        return;
+    }
+    MoveRecord *rec = &move->history[move->move_count];
+    Piece moving_piece = rec->moved_piece;
+    if(rec->is_en_passant) {
+        if(moving_piece.color == WHITE) {
+            board->blackcaptured[board->blackcapturedcount++] = board->square[rec->enpassant_row + 1][rec->enpassant_col];
+            board->square[rec->enpassant_row + 1][rec->enpassant_col].type = EMPTY;
+            board->square[rec->enpassant_row + 1][rec->enpassant_col].color = EMPTY;
+        } else if(moving_piece.color == BLACK) {
+            board->whitecaptured[board->whitecapturedcount++] = board->square[rec->enpassant_row - 1][rec->enpassant_col];
+            board->square[rec->enpassant_row - 1][rec->enpassant_col].type = EMPTY;
+            board->square[rec->enpassant_row - 1][rec->enpassant_col].color = EMPTY;
+        }
+    }
+    if (rec->moved_piece.type == KING && rec->moved_piece.color == WHITE) {
+        if (rec->from_row == 7 && rec->from_col == 4 && rec->to_row == 7 && rec->to_col == 6) {
+            execute_move(board, 7, 7, 7, 5);  
+        } else if (rec->from_row == 7 && rec->from_col == 4 && rec->to_row == 7 && rec->to_col == 2) {
+            execute_move(board, 7, 0, 7, 3);  
+        }
+    } else if (rec->moved_piece.type == KING && rec->moved_piece.color == BLACK) {
+        if (rec->from_row == 0 && rec->from_col == 4 && rec->to_row == 0 && rec->to_col == 6) {
+            execute_move(board, 0, 7, 0, 5); 
+        } else if (rec->from_row == 0 && rec->from_col == 4 && rec->to_row == 0 && rec->to_col == 2) {
+            execute_move(board, 0, 0, 0, 3);
+        }
+    }
+    execute_move(board, rec->from_row, rec->from_col, rec->to_row, rec->to_col);
+    move->move_count++;
+    move->undo_count--;
+    
+    if(rec->promoted_piece.type != EMPTY) {
+        board->square[rec->to_row][rec->to_col] = rec->promoted_piece;
+    }
+}
