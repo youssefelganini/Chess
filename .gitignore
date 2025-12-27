@@ -1,0 +1,25 @@
+# ---------------- Build Artifacts ----------------
+# Object files
+obj/
+*.o
+
+# Executables / binaries
+bin/
+chess
+
+# ---------------- IDE / Editor Files ----------------
+.vscode/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# ---------------- OS Generated Files ----------------
+.DS_Store
+Thumbs.db
+
+# ---------------- Logs ----------------
+*.log
+
+# ---------------- Backup / Temp ----------------
+*~
