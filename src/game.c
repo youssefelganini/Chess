@@ -80,7 +80,7 @@ void game_loop(Game *game){
         if (strncmp(input, "save ", 5) == 0) {
             char filename[95];
             sscanf(input + 5, "%s", filename);
-            save_game(game, filename);
+            save_game(game, filename,&move);
             printf("======================================\n");
             printf("Game saved to %s\n", filename);
             continue;
@@ -88,7 +88,7 @@ void game_loop(Game *game){
         if(strncmp(input, "load ", 5) == 0) {
             char filename[95];
             sscanf(input + 5, "%s", filename);
-            Game *loaded_game = load_game(filename);
+            Game *loaded_game = load_game(filename,&move);
             if (loaded_game != NULL) {
                 *game = *loaded_game;
                 free(loaded_game);
@@ -152,6 +152,7 @@ void game_loop(Game *game){
                     printf("YOUR KING WILL BE IN CHECK!\n");
                     
                 }
+                
                 continue;
             }
             
@@ -170,7 +171,6 @@ void game_loop(Game *game){
         else{
             game->current_player = WHITE;
         }
-        
-
     }
+    
 }
