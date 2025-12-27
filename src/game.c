@@ -46,15 +46,20 @@ void game_loop(Game *game){
 
 
         if(chekmate(&game->board,&move,game)){
-            printf("WON");
+            if(game->current_player==WHITE){
+            printf("\nBLACK WON\n");
+            }
+            if(game->current_player==BLACK){
+                printf("\nWHITE WON\n");
+            }
             break;
         }
         if(stalmate(&tempboard,game)||draw(&game->board,game)){
-            printf("DRAW!");
+            printf("\nDRAW!\n");
             break;
         } 
         if (is_king_checked(&game->board,game)) {
-            printf("CHECK!\n");
+            printf("\nCHECK!\n");
             game->flag=1;
         }      
 
@@ -120,20 +125,18 @@ void game_loop(Game *game){
         tocol = input_as_int[2];
         torow = input_as_int[3];
 
-
-
-
-         if(castling(input,game,&game->board, &move)){
-             if (game->current_player == WHITE){
-             game->current_player = BLACK;
-             }
-             else{
-             game->current_player = WHITE;
-             } 
-             continue;  
-         }
+        if(castling(input,game,&game->board, &move)){
+            if (game->current_player == WHITE){
+            game->current_player = BLACK;
+            }
+            else{
+            game->current_player = WHITE;
+            } 
+            continue;  
+        }
 
         if (!validation(&game->board, game,fromrow,fromcol,torow,tocol)) {
+            printf("\nINVALID MOVE!\n");
             continue;
         }
         enpasswn(&tempboard, &move, fromrow, fromcol, torow, tocol);

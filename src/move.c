@@ -6,13 +6,6 @@
 #include"/mnt/d/study/programming/Project/Chess/include/game.h"
 
 
-/*
-1-checkmate
-2-stalmate{2loops(King vs King),(ing + Bishop vs King),(King + Knight vs King),(King + Bishop + Bishop (both same color) vs King)} donne
-3-report
-*/
-
-
 
 
 /*----------------------------------------------HELPER FN------------------------------------------------*/
@@ -105,7 +98,8 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
 }
 int castling(char *castl,Game *game,Board *board, Move *move) {
     convert_input_to_int(castl);
-    char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]);
+    if(board->square[input_as_int[1]][input_as_int[0]].type!=KING) return 0;
+    if(abs(input_as_int[2]-input_as_int[0])!=2) return 0;
     Board tempbaord=*board;
     execute_move(&tempbaord,input_as_int[1],input_as_int[0],input_as_int[3],input_as_int[2]);
     if(is_king_checked(board,game)) {
@@ -115,18 +109,17 @@ int castling(char *castl,Game *game,Board *board, Move *move) {
     if(is_king_checked(&tempbaord,game)){
     printf("\nYOU CANNOT CASTLING YOUR KING WILL BE CHECEKD\n");
     return 0;
-    
     }
+
     if(game->current_player==WHITE){
-        if(piece!='K') return 0;
         if(input_as_int[2]==6&&input_as_int[3]==7){
-            if(board->whitekingmoved==1||board->whiterook_hmoved==1){
-                printf("You cannot castle, king or rook has moved\n");
+            if(board->whitekingmoved==1||board->whiterook_hmoved==1||board->whiterook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
                 return 0;
             }
             if(board->square[7][4].type!=KING||board->square[7][7].type!=ROOK) return 0;
             if(!castling_path_clear(board,7,4,7)){
-                printf("Cannot castle, path blocked\n");
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
                 return 0;
             }
             record_move(move,7,4,7,6,board->square[7][4],board->square[7][6],board);
@@ -135,12 +128,12 @@ int castling(char *castl,Game *game,Board *board, Move *move) {
             return 1;
         } else if(input_as_int[2]==2&&input_as_int[3]==7){
             if(board->whitekingmoved==1||board->whiterook_amoved==1){
-                printf("You cannot castle, king or rook has moved\n");
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
                 return 0;
             }
             if(board->square[7][4].type!=KING||board->square[7][0].type!=ROOK) return 0;
             if(!castling_path_clear(board,7,4,0)){
-                printf("Cannot castle, path blocked\n");
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
                 return 0;
             }
             record_move(move,7,4,7,2,board->square[7][4],board->square[7][2],board);
@@ -151,15 +144,14 @@ int castling(char *castl,Game *game,Board *board, Move *move) {
             return 0;
         }
     } else if(game->current_player==BLACK){
-        if(piece!='k') return 0;
         if(input_as_int[2]==6&&input_as_int[3]==0){
-            if(board->blackkingmoved==1||board->blackrook_hmoved==1){
-                printf("You cannot castle, king or rook has moved\n");
+            if(board->blackkingmoved==1||board->blackrook_hmoved==1||board->blackrook_amoved==1){
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
                 return 0;
             }
             if(board->square[0][4].type!=KING||board->square[0][7].type!=ROOK) return 0;
             if(!castling_path_clear(board,0,4,7)){
-                printf("Cannot castle, path blocked\n");
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
                 return 0;
             }
             record_move(move,0,4,0,6,board->square[0][4],board->square[0][6],board);
@@ -168,12 +160,12 @@ int castling(char *castl,Game *game,Board *board, Move *move) {
             return 1;
         } else if(input_as_int[2]==2&&input_as_int[3]==0){
             if(board->blackkingmoved==1||board->blackrook_amoved==1){
-                printf("You cannot castle, king or rook has moved\n");
+                printf("\nYOU CANNOT CASTL, KING OR ROOK HAS MOVED\n");
                 return 0;
             }
             if(board->square[0][4].type!=KING||board->square[0][0].type!=ROOK) return 0;
             if(!castling_path_clear(board,0,4,0)){
-                printf("Cannot castle, path blocked\n");
+                printf("\nCANNOT CASTLE, PATH IS BLOCKED\n");
                 return 0;
             }
             record_move(move,0,4,0,2,board->square[0][4],board->square[0][2],board);
@@ -186,9 +178,6 @@ int castling(char *castl,Game *game,Board *board, Move *move) {
     }
     return 0;
 }
-
-
-
 /*----------------------------------------------PROMATION------------------------------------------------*/
 int pawn_promotion(Board *board){
     if(board->square[input_as_int[3]][input_as_int[2]].type==PAWN &&
@@ -206,6 +195,10 @@ int change_pawn(Board *board, Move *move){
         char promotion;
         printf("Enter which piece you want\n");
         scanf(" %c",&promotion);
+        while(promotion!='q'&& promotion!='r'&& promotion!='b'&& promotion!='n'){
+            printf("\nINVLID INPIT\n");
+            scanf(' %c',promotion);
+        }
         switch(promotion){
             case 'Q':
             case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN;break;
@@ -395,7 +388,6 @@ int stalmate(Board *board,Game *game){
                         Board temp = *board;
                         execute_move(&temp,from_row,from_col,to_row,to_col);
                         if(is_king_checked(&temp,game)==0) return 0;
-
                     }
                 }
             }
