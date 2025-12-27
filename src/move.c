@@ -103,7 +103,7 @@ int castling_path_clear(Board *board,int king_row,int king_col,int rook_col) {
     }
     return 1; 
 }
-int castling(char *castl,Game *game,Board *board){
+int castling(char *castl,Game *game,Board *board, Move *move) {
     convert_input_to_int(castl);
     char piece=piece_char(board->square[input_as_int[1]][input_as_int[0]]);
     Board tempbaord=*board;
@@ -129,6 +129,7 @@ int castling(char *castl,Game *game,Board *board){
                 printf("Cannot castle, path blocked\n");
                 return 0;
             }
+            record_move(move,7,4,7,6,board->square[7][4],board->square[7][6],board);
             execute_move(board,7,4,7,6);
             execute_move(board,7,7,7,5);
             return 1;
@@ -142,6 +143,7 @@ int castling(char *castl,Game *game,Board *board){
                 printf("Cannot castle, path blocked\n");
                 return 0;
             }
+            record_move(move,7,4,7,2,board->square[7][4],board->square[7][2],board);
             execute_move(board,7,4,7,2);
             execute_move(board,7,0,7,3);
             return 1;
@@ -160,6 +162,7 @@ int castling(char *castl,Game *game,Board *board){
                 printf("Cannot castle, path blocked\n");
                 return 0;
             }
+            record_move(move,0,4,0,6,board->square[0][4],board->square[0][6],board);
             execute_move(board,0,4,0,6);
             execute_move(board,0,7,0,5);
             return 1;
@@ -173,6 +176,7 @@ int castling(char *castl,Game *game,Board *board){
                 printf("Cannot castle, path blocked\n");
                 return 0;
             }
+            record_move(move,0,4,0,2,board->square[0][4],board->square[0][2],board);
             execute_move(board,0,4,0,2);
             execute_move(board,0,0,0,3);
             return 1;
@@ -298,7 +302,6 @@ int can_attack(Board *board,int from_row,int from_col,int to_row,int to_col){
     }
 
 }
-
 
 int is_king_checked(Board *board,Game *game){    
     int white_king_row = -1, white_king_col = -1;
@@ -618,20 +621,48 @@ void record_move(Move *move, int from_row, int from_col, int to_row, int to_col,
 }
 void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece ,Move *move) {
     board->square[from_row][from_col] = moved_piece;  
-    if(move->history[move->move_count].enpassant_col == to_col && move->history[move->move_count].enpassant_row == to_row && moved_piece.type == PAWN) {
+    if(move->history[move->move_count - 1].enpassant_col == to_col && move->history[move->move_count - 1].enpassant_row == to_row && moved_piece.type == PAWN) {
         if(moved_piece.color == WHITE) {
-            board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col] = captured_piece;
+            board->square[move->history[move->move_count - 1].enpassant_row + 1][move->history[move->move_count - 1].enpassant_col] = captured_piece;
             board->square[to_row][to_col].type = EMPTY;
             board->square[to_row][to_col].color = EMPTY;
         } else if(moved_piece.color == BLACK) {
-            board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col] = captured_piece;
+            board->square[move->history[move->move_count - 1].enpassant_row - 1][move->history[move->move_count - 1].enpassant_col] = captured_piece;
             board->square[to_row][to_col].type = EMPTY;
             board->square[to_row][to_col].color = EMPTY;
         }
-    } else {
+    } else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == WHITE && from_col == 4 && from_row == 7 && to_col == 6 && to_row == 7) {
+        printf("Undoing white kingside castling\n");
+        board->square[7][7] = board->square[7][5];
+        board->square[7][5].type = EMPTY;
+        board->square[7][5].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == WHITE && from_col == 2 && from_row == 7 && to_col == 4 && to_row == 7) {
+        board->square[7][0] = board->square[7][3];
+        board->square[7][3].type = EMPTY;
+        board->square[7][3].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == BLACK && from_col == 4 && from_row == 0 && to_col == 6 && to_row == 0) {
+        board->square[0][7] = board->square[0][5];
+        board->square[0][5].type = EMPTY;
+        board->square[0][5].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+    else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == BLACK && from_col == 4 && from_row == 0 && to_col == 2 && to_row == 0) {
+        board->square[0][0] = board->square[0][3];
+        board->square[0][3].type = EMPTY;
+        board->square[0][3].color = EMPTY;
+        board->square[to_row][to_col].type = EMPTY;
+        board->square[to_row][to_col].color = EMPTY;
+    }
+     else {
         board->square[to_row][to_col] = captured_piece;
     }
-    // Reset movement flags if undoing a king or rook move (to allow castling again if applicable)
     if (moved_piece.type == KING) {
         if (moved_piece.color == WHITE) {
             board->whitekingmoved = 0;  // Reset flag
@@ -663,6 +694,7 @@ void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_c
             board->bkingsq[1] = from_col;
         }
     }
+    
 }
 void undo_move(Move *move, Board *board){
     if (move->move_count == 0) {
@@ -707,6 +739,19 @@ void redo_move(Move *move, Board *board) {
             board->whitecaptured[board->whitecapturedcount++] = board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col];
             board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col].type = EMPTY;
             board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col].color = EMPTY;
+        }
+    }
+    if (rec->moved_piece.type == KING && rec->moved_piece.color == WHITE) {
+        if (rec->from_row == 7 && rec->from_col == 4 && rec->to_row == 7 && rec->to_col == 6) {
+            execute_move(board, 7, 7, 7, 5);  
+        } else if (rec->from_row == 7 && rec->from_col == 4 && rec->to_row == 7 && rec->to_col == 2) {
+            execute_move(board, 7, 0, 7, 3);  
+        }
+    } else if (rec->moved_piece.type == KING && rec->moved_piece.color == BLACK) {
+        if (rec->from_row == 0 && rec->from_col == 4 && rec->to_row == 0 && rec->to_col == 6) {
+            execute_move(board, 0, 7, 0, 5); 
+        } else if (rec->from_row == 0 && rec->from_col == 4 && rec->to_row == 0 && rec->to_col == 2) {
+            execute_move(board, 0, 0, 0, 3);
         }
     }
     execute_move(board, rec->from_row, rec->from_col, rec->to_row, rec->to_col);

@@ -121,7 +121,9 @@ void game_loop(Game *game){
         torow = input_as_int[3];
 
 
-         if(castling(input,game,&game->board)){
+
+
+         if(castling(input,game,&game->board, &move)){
              if (game->current_player == WHITE){
              game->current_player = BLACK;
              }
