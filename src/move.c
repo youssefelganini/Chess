@@ -1,9 +1,9 @@
-#include"/mnt/d/study/programming/Project/Chess/include/move.h"
+#include"move.h"
 #include<math.h>
 #include<stdio.h>
-#include"/mnt/d/study/programming/Project/Chess/include/board.h"
+#include"board.h"
 #include<stdlib.h>
-#include"/mnt/d/study/programming/Project/Chess/include/game.h"
+#include"game.h"
 
 
 /*
@@ -204,8 +204,12 @@ int pawn_promotion(Board *board){
 int change_pawn(Board *board, Move *move){
     if(pawn_promotion(board)){
         char promotion;
-        printf("Enter which piece you want\n");
+        printf("Enter which piece you want (<Q/q>, <R/r>, <B/b>, <N/n>)\n");
         scanf(" %c",&promotion);
+        while(promotion!='Q'&&promotion!='q'&&promotion!='R'&&promotion!='r'&&promotion!='B'&&promotion!='b'&&promotion!='N'&&promotion!='n'){
+            printf("Invalid input, please enter again\n");
+            promotion=fgetchar();
+        }
         switch(promotion){
             case 'Q':
             case 'q': board->square[input_as_int[3]][input_as_int[2]].type=QUEEN;break;
@@ -219,6 +223,7 @@ int change_pawn(Board *board, Move *move){
                 printf("Invalid input\n");
                 return 0;
         }
+        while(getchar() != '\n'); 
         move->history[move->move_count - 1].promoted_piece = board->square[input_as_int[3]][input_as_int[2]];
         return 1;
     }
@@ -233,11 +238,13 @@ int enpasswn(Board *board, Move *move, int from_row, int from_col,int to_row, in
             move->history[move->move_count - 1].captured_piece = board->square[board->enpassen_row + 1][board->enpassen_col];
             board->square[board->enpassen_row + 1][board->enpassen_col].type = EMPTY;
             board->square[board->enpassen_row + 1][board->enpassen_col].color = EMPTY;
+            move->history[move->move_count - 1].is_en_passant = 1;
         } else if(moving_piece.color == BLACK) {
             board->whitecaptured[board->whitecapturedcount++] = board->square[board->enpassen_row - 1][board->enpassen_col];
             move->history[move->move_count - 1].captured_piece = board->square[board->enpassen_row - 1][board->enpassen_col];
             board->square[board->enpassen_row - 1][board->enpassen_col].type = EMPTY;
             board->square[board->enpassen_row - 1][board->enpassen_col].color = EMPTY;
+            move->history[move->move_count - 1].is_en_passant = 1;
         }
     }
 
@@ -607,32 +614,48 @@ void record_move(Move *move, int from_row, int from_col, int to_row, int to_col,
     move->to_col = to_col;
     move->moved_piece = moved_piece;
     move->captured_piece = captured_piece;
-    move->history[move->move_count].from_row = from_row;
-    move->history[move->move_count].from_col = from_col;
-    move->history[move->move_count].to_row = to_row;
-    move->history[move->move_count].to_col = to_col;
+    
+    MoveRecord *rec = &move->history[move->move_count];
+    rec->from_row = from_row;
+    rec->from_col = from_col;
+    rec->to_row = to_row;
+    rec->to_col = to_col;
+    rec->moved_piece = moved_piece;
+    rec->captured_piece = captured_piece;
+    rec->promoted_piece.type = EMPTY;
+    rec->promoted_piece.color = EMPTY;
+    rec->is_en_passant = 0;
     if(board->enpassen_row != -1 && board->enpassen_col != -1) {
-        move->history[move->move_count].enpassant_row = board->enpassen_row;
-        move->history[move->move_count].enpassant_col = board->enpassen_col;
+        rec->enpassant_row = board->enpassen_row;
+        rec->enpassant_col = board->enpassen_col;
+    } else {
+        rec->enpassant_row = -1;
+        rec->enpassant_col = -1;
     }
-    move->history[move->move_count].moved_piece = moved_piece;
-    move->history[move->move_count].captured_piece = captured_piece;
+    
+    rec->white_king_moved = board->whitekingmoved;
+    rec->black_king_moved = board->blackkingmoved;
+    rec->white_rook_a_moved = board->whiterook_amoved;
+    rec->white_rook_h_moved = board->whiterook_hmoved;
+    rec->black_rook_a_moved = board->blackrook_amoved;
+    rec->black_rook_h_moved = board->blackrook_hmoved;
+    
     move->move_count++;
+    move->undo_count = 0;
 }
 void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_col, Piece moved_piece, Piece captured_piece ,Move *move) {
     board->square[from_row][from_col] = moved_piece;  
-    if(move->history[move->move_count - 1].enpassant_col == to_col && move->history[move->move_count - 1].enpassant_row == to_row && moved_piece.type == PAWN) {
+    if(move->history[move->move_count].is_en_passant) {
         if(moved_piece.color == WHITE) {
-            board->square[move->history[move->move_count - 1].enpassant_row + 1][move->history[move->move_count - 1].enpassant_col] = captured_piece;
+            board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col] = captured_piece;
             board->square[to_row][to_col].type = EMPTY;
             board->square[to_row][to_col].color = EMPTY;
         } else if(moved_piece.color == BLACK) {
-            board->square[move->history[move->move_count - 1].enpassant_row - 1][move->history[move->move_count - 1].enpassant_col] = captured_piece;
+            board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col] = captured_piece;
             board->square[to_row][to_col].type = EMPTY;
             board->square[to_row][to_col].color = EMPTY;
         }
     } else if (move->history[move->move_count].moved_piece.type == KING && move->history[move->move_count].moved_piece.color == WHITE && from_col == 4 && from_row == 7 && to_col == 6 && to_row == 7) {
-        printf("Undoing white kingside castling\n");
         board->square[7][7] = board->square[7][5];
         board->square[7][5].type = EMPTY;
         board->square[7][5].color = EMPTY;
@@ -659,6 +682,10 @@ void reverse_move(Board *board, int from_row, int from_col, int to_row, int to_c
         board->square[0][3].color = EMPTY;
         board->square[to_row][to_col].type = EMPTY;
         board->square[to_row][to_col].color = EMPTY;
+    }
+    else if(move->history[move->move_count].promoted_piece.type != EMPTY) {
+        board->square[from_row][from_col].type = PAWN;
+        board->square[to_row][to_col] = captured_piece;
     }
      else {
         board->square[to_row][to_col] = captured_piece;
@@ -715,6 +742,17 @@ void undo_move(Move *move, Board *board){
             board->blackcaptured[board->blackcapturedcount].color = EMPTY;
         }
     }
+    if(rec->is_en_passant && rec->captured_piece.type != EMPTY) {
+        if(rec->captured_piece.color == WHITE) {
+            if(board->whitecapturedcount > 0) {
+                board->whitecapturedcount--;
+            }
+        } else if(rec->captured_piece.color == BLACK) {
+            if(board->blackcapturedcount > 0) {
+                board->blackcapturedcount--;
+            }
+        }
+    }
     
     if(rec->promoted_piece.type != EMPTY) {
         board->square[rec->from_row][rec->from_col] = rec->moved_piece;
@@ -728,17 +766,15 @@ void redo_move(Move *move, Board *board) {
     }
     MoveRecord *rec = &move->history[move->move_count];
     Piece moving_piece = rec->moved_piece;
-    int to_row = rec->to_row;
-    int to_col = rec->to_col;
-    if(moving_piece.type == PAWN && to_row == move->history[move->move_count].enpassant_row && to_col == move->history[move->move_count].enpassant_col) {
+    if(rec->is_en_passant) {
         if(moving_piece.color == WHITE) {
-            board->blackcaptured[board->blackcapturedcount++] = board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col];
-            board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col].type = EMPTY;
-            board->square[move->history[move->move_count].enpassant_row + 1][move->history[move->move_count].enpassant_col].color = EMPTY;
+            board->blackcaptured[board->blackcapturedcount++] = board->square[rec->enpassant_row + 1][rec->enpassant_col];
+            board->square[rec->enpassant_row + 1][rec->enpassant_col].type = EMPTY;
+            board->square[rec->enpassant_row + 1][rec->enpassant_col].color = EMPTY;
         } else if(moving_piece.color == BLACK) {
-            board->whitecaptured[board->whitecapturedcount++] = board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col];
-            board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col].type = EMPTY;
-            board->square[move->history[move->move_count].enpassant_row - 1][move->history[move->move_count].enpassant_col].color = EMPTY;
+            board->whitecaptured[board->whitecapturedcount++] = board->square[rec->enpassant_row - 1][rec->enpassant_col];
+            board->square[rec->enpassant_row - 1][rec->enpassant_col].type = EMPTY;
+            board->square[rec->enpassant_row - 1][rec->enpassant_col].color = EMPTY;
         }
     }
     if (rec->moved_piece.type == KING && rec->moved_piece.color == WHITE) {

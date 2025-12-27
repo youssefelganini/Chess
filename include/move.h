@@ -3,7 +3,7 @@
 #include"board.h"
 #include"game.h"
 typedef struct {
-    int from_row, from_col, to_row, to_col ,enpassant_row,enpassant_col;
+    int from_row, from_col, to_row, to_col ,enpassant_row,enpassant_col,is_en_passant,white_king_moved,black_king_moved,white_rook_a_moved,white_rook_h_moved,black_rook_a_moved,black_rook_h_moved;
     Piece moved_piece, captured_piece ,promoted_piece;
 } MoveRecord;
 typedef struct {
