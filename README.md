@@ -201,6 +201,7 @@ This project is available for educational purposes. Please check with the reposi
 ## 👥 Authors
 
 - **Youssef Elganini** - [GitHub Profile](https://github.com/youssefelganini)
+- **Adham Hamada** - [GitHub Profile](https://github.com/adham-hamada)
 
 ## 🙏 Acknowledgments
 
